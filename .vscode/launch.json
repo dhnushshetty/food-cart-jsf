@@ -1,0 +1,14 @@
+{
+  "configurations": [
+    {
+      "type": "java",
+      "name": "Spring Boot-FoodCartPlatformApplication<foodcart>",
+      "request": "launch",
+      "cwd": "${workspaceFolder}",
+      "mainClass": "com.food.cart.FoodCartPlatformApplication",
+      "projectName": "foodcart",
+      "args": "",
+      "envFile": "${workspaceFolder}/.env"
+    }
+  ]
+}

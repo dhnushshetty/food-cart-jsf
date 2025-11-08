@@ -1,0 +1,152 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Register - Food Cart Platform</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body { font-family: Arial, sans-serif; background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); min-height: 100vh; display: flex; align-items: center; justify-content: center; padding: 2rem; }
+        .container { background: white; padding: 2rem; border-radius: 8px; box-shadow: 0 4px 6px rgba(0,0,0,0.1); width: 100%; max-width: 500px; }
+        h2 { color: #2c3e50; margin-bottom: 1.5rem; text-align: center; }
+        .tabs { display: flex; margin-bottom: 2rem; }
+        .tab { flex: 1; padding: 1rem; text-align: center; background: #ecf0f1; cursor: pointer; border: none; font-size: 1rem; font-weight: bold; }
+        .tab.active { background: #667eea; color: white; }
+        .form-group { margin-bottom: 1rem; }
+        label { display: block; margin-bottom: 0.5rem; color: #2c3e50; font-weight: bold; }
+        input, textarea { width: 100%; padding: 0.8rem; border: 1px solid #ddd; border-radius: 4px; font-size: 1rem; }
+        textarea { resize: vertical; min-height: 80px; }
+        input:focus, textarea:focus { outline: none; border-color: #667eea; }
+        .btn { width: 100%; padding: 0.8rem; background: #667eea; color: white; border: none; border-radius: 4px; font-size: 1rem; font-weight: bold; cursor: pointer; margin-top: 1rem; }
+        .btn:hover { background: #5568d3; }
+        .error { color: #e74c3c; margin-top: 1rem; text-align: center; display: none; }
+        .success { color: #27ae60; margin-top: 1rem; text-align: center; display: none; }
+        .links { text-align: center; margin-top: 1rem; }
+        .links a { color: #667eea; text-decoration: none; }
+        .hidden { display: none; }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h2>🍕 Register</h2>
+        <div class="tabs">
+            <button class="tab active" onclick="showTab('customer')">Customer</button>
+            <button class="tab" onclick="showTab('owner')">Shop Owner</button>
+        </div>
+        
+        <form id="customerForm">
+            <div class="form-group">
+                <label for="c_username">Username</label>
+                <input type="text" id="c_username" required>
+            </div>
+            <div class="form-group">
+                <label for="c_email">Email</label>
+                <input type="email" id="c_email" required>
+            </div>
+            <div class="form-group">
+                <label for="c_password">Password</label>
+                <input type="password" id="c_password" required>
+            </div>
+            <button type="submit" class="btn">Register as Customer</button>
+        </form>
+        
+        <form id="ownerForm" class="hidden">
+            <div class="form-group">
+                <label for="o_username">Username</label>
+                <input type="text" id="o_username">
+            </div>
+            <div class="form-group">
+                <label for="o_email">Email</label>
+                <input type="email" id="o_email">
+            </div>
+            <div class="form-group">
+                <label for="o_password">Password</label>
+                <input type="password" id="o_password">
+            </div>
+            <div class="form-group">
+                <label for="shopName">Shop Name</label>
+                <input type="text" id="shopName">
+            </div>
+            <div class="form-group">
+                <label for="description">Description</label>
+                <textarea id="description"></textarea>
+            </div>
+            <div class="form-group">
+                <label for="address">Address</label>
+                <input type="text" id="address">
+            </div>
+            <button type="submit" class="btn">Register as Owner</button>
+        </form>
+        
+        <div class="error" id="error"></div>
+        <div class="success" id="success"></div>
+        <div class="links">
+            <p>Already have an account? <a href="/login">Login here</a></p>
+            <p><a href="/">Back to Home</a></p>
+        </div>
+    </div>
+    
+    <script>
+        function showTab(type) {
+            const tabs = document.querySelectorAll('.tab');
+            tabs.forEach(t => t.classList.remove('active'));
+            event.target.classList.add('active');
+            
+            if (type === 'customer') {
+                document.getElementById('customerForm').classList.remove('hidden');
+                document.getElementById('ownerForm').classList.add('hidden');
+            } else {
+                document.getElementById('customerForm').classList.add('hidden');
+                document.getElementById('ownerForm').classList.remove('hidden');
+            }
+        }
+        
+        document.getElementById('customerForm').addEventListener('submit', async (e) => {
+            e.preventDefault();
+            const data = {
+                username: document.getElementById('c_username').value,
+                email: document.getElementById('c_email').value,
+                password: document.getElementById('c_password').value
+            };
+            await register('/api/auth/register/customer', data);
+        });
+        
+        document.getElementById('ownerForm').addEventListener('submit', async (e) => {
+            e.preventDefault();
+            const data = {
+                username: document.getElementById('o_username').value,
+                email: document.getElementById('o_email').value,
+                password: document.getElementById('o_password').value,
+                shopName: document.getElementById('shopName').value,
+                description: document.getElementById('description').value,
+                address: document.getElementById('address').value
+            };
+            await register('/api/auth/register/owner', data);
+        });
+        
+        async function register(url, data) {
+            try {
+                const response = await fetch(url, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(data)
+                });
+                
+                if (response.ok) {
+                    document.getElementById('success').textContent = 'Registration successful! Redirecting to login...';
+                    document.getElementById('success').style.display = 'block';
+                    document.getElementById('error').style.display = 'none';
+                    setTimeout(() => window.location.href = '/login', 2000);
+                } else {
+                    const error = await response.text();
+                    document.getElementById('error').textContent = error || 'Registration failed';
+                    document.getElementById('error').style.display = 'block';
+                }
+            } catch (error) {
+                document.getElementById('error').textContent = 'Registration failed. Please try again.';
+                document.getElementById('error').style.display = 'block';
+            }
+        }
+    </script>
+</body>
+</html>

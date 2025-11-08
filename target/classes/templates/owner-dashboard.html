@@ -1,0 +1,385 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Owner Dashboard</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body { font-family: Arial, sans-serif; background: #f5f5f5; }
+        .navbar { background: #2c3e50; color: white; padding: 1rem 2rem; display: flex; justify-content: space-between; align-items: center; }
+        .container { max-width: 1200px; margin: 2rem auto; padding: 0 2rem; }
+        .stats { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 1rem; margin-bottom: 2rem; }
+        .stat-card { background: white; padding: 1.5rem; border-radius: 4px; text-align: center; }
+        .stat-card h3 { font-size: 2rem; color: #667eea; }
+        .section { background: white; padding: 1.5rem; border-radius: 4px; margin-bottom: 2rem; }
+        .section h2 { margin-bottom: 1rem; color: #2c3e50; }
+        .form-group { margin-bottom: 1rem; }
+        .form-group label { display: block; margin-bottom: 0.5rem; font-weight: bold; }
+        .form-group input, .form-group textarea { width: 100%; padding: 0.5rem; border: 1px solid #ddd; border-radius: 4px; }
+        .menu-item { padding: 1rem; border-bottom: 1px solid #eee; display: flex; justify-content: space-between; align-items: center; }
+        .menu-item-info { flex: 1; }
+        .menu-item-actions { display: flex; gap: 0.5rem; }
+        .order { padding: 1rem; border-bottom: 1px solid #eee; margin-bottom: 1rem; background: #f8f9fa; border-radius: 4px; }
+        .order.delivered { background: #d4edda; }
+        .btn { padding: 0.5rem 1rem; background: #667eea; color: white; border: none; border-radius: 4px; cursor: pointer; margin: 0.2rem; }
+        .btn-danger { background: #e74c3c; }
+        .btn-success { background: #27ae60; }
+        .btn-disabled { background: #95a5a6; cursor: not-allowed; }
+        .tabs { display: flex; gap: 1rem; margin-bottom: 1rem; border-bottom: 2px solid #eee; }
+        .tab { padding: 1rem; cursor: pointer; border-bottom: 3px solid transparent; }
+        .tab.active { border-bottom-color: #667eea; color: #667eea; font-weight: bold; }
+        .tab-content { display: none; }
+        .tab-content.active { display: block; }
+        .modal { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.5); z-index: 1000; }
+        .modal-content { background: white; margin: 2rem auto; padding: 2rem; border-radius: 8px; max-width: 600px; }
+        .modal-header { display: flex; justify-content: space-between; margin-bottom: 1rem; }
+        .close { font-size: 2rem; cursor: pointer; }
+    </style>
+</head>
+<body>
+    <nav class="navbar">
+        <h1>📊 Owner Dashboard</h1>
+        <a href="#" onclick="logout()" style="color: white; text-decoration: none;">Logout</a>
+    </nav>
+    <div class="container">
+        <div class="stats" id="stats"></div>
+        
+        <div class="tabs">
+            <div class="tab active" onclick="showTab('shop')">🏪 Shop Details</div>
+            <div class="tab" onclick="showTab('menu')">🍕 Menu Items</div>
+            <div class="tab" onclick="showTab('orders')">📦 Orders</div>
+        </div>
+        
+        <div id="shop-tab" class="tab-content active">
+            <div class="section">
+                <h2>Update Shop Details</h2>
+                <form onsubmit="updateShop(event)">
+                    <div class="form-group">
+                        <label>Shop Name</label>
+                        <input type="text" id="shopName" required>
+                    </div>
+                    <div class="form-group">
+                        <label>Description</label>
+                        <textarea id="shopDescription" rows="3" required></textarea>
+                    </div>
+                    <div class="form-group">
+                        <label>Address</label>
+                        <input type="text" id="shopAddress" required>
+                    </div>
+                    <button type="submit" class="btn btn-success">Update Shop</button>
+                </form>
+            </div>
+        </div>
+        
+        <div id="menu-tab" class="tab-content">
+            <div class="section">
+                <h2>Add Menu Item</h2>
+                <form onsubmit="addMenuItem(event)">
+                    <div class="form-group">
+                        <label>Item Name</label>
+                        <input type="text" id="itemName" required>
+                    </div>
+                    <div class="form-group">
+                        <label>Description</label>
+                        <textarea id="itemDescription" rows="2" required></textarea>
+                    </div>
+                    <div class="form-group">
+                        <label>Price (₹)</label>
+                        <input type="number" step="0.01" id="itemPrice" required>
+                    </div>
+                    <div class="form-group">
+                        <label>Image</label>
+                        <input type="file" id="itemImageFile" accept="image/*">
+                        <small>Or enter URL:</small>
+                        <input type="text" id="itemImage" placeholder="https://example.com/image.jpg">
+                    </div>
+                    <button type="submit" class="btn btn-success">Add Menu Item</button>
+                </form>
+            </div>
+            
+            <div class="section">
+                <h2>Your Menu Items</h2>
+                <div id="menuItems"></div>
+            </div>
+        </div>
+        
+        <div id="orders-tab" class="tab-content">
+            <div class="section">
+                <h2>Recent Orders</h2>
+                <div id="orders"></div>
+            </div>
+        </div>
+    </div>
+    
+    <div id="editModal" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2>Edit Menu Item</h2>
+                <span class="close" onclick="closeEditModal()">&times;</span>
+            </div>
+            <form onsubmit="saveEdit(event)">
+                <input type="hidden" id="editItemId">
+                <div class="form-group">
+                    <label>Item Name</label>
+                    <input type="text" id="editItemName" required>
+                </div>
+                <div class="form-group">
+                    <label>Description</label>
+                    <textarea id="editItemDescription" rows="2" required></textarea>
+                </div>
+                <div class="form-group">
+                    <label>Price (₹)</label>
+                    <input type="number" step="0.01" id="editItemPrice" required>
+                </div>
+                <div class="form-group">
+                    <label>Image</label>
+                    <input type="file" id="editItemImageFile" accept="image/*">
+                    <small>Or enter URL:</small>
+                    <input type="text" id="editItemImage" placeholder="https://example.com/image.jpg">
+                </div>
+                <button type="submit" class="btn btn-success">Save Changes</button>
+                <button type="button" class="btn" onclick="closeEditModal()">Cancel</button>
+            </form>
+        </div>
+    </div>
+    
+    <script>
+        const token = localStorage.getItem('token');
+        if (!token) window.location.href = '/login';
+        
+        let shopId = null;
+        
+        function showTab(tab) {
+            document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
+            document.querySelectorAll('.tab-content').forEach(c => c.classList.remove('active'));
+            event.target.classList.add('active');
+            document.getElementById(tab + '-tab').classList.add('active');
+        }
+        
+        async function loadDashboard() {
+            await loadStats();
+            await loadShop();
+            await loadMenuItems();
+            await loadOrders();
+        }
+        
+        async function loadStats() {
+            const statsRes = await fetch('/api/owner/statistics', {
+                headers: { 'Authorization': 'Bearer ' + token }
+            });
+            const stats = await statsRes.json();
+            
+            document.getElementById('stats').innerHTML = 
+                '<div class="stat-card"><h3>₹' + (stats.totalRevenue || 0) + '</h3><p>Total Revenue</p></div>' +
+                '<div class="stat-card"><h3>' + (stats.pendingOrdersCount || 0) + '</h3><p>Pending Orders</p></div>';
+        }
+        
+        async function loadShop() {
+            const res = await fetch('/api/owner/my-shop', {
+                headers: { 'Authorization': 'Bearer ' + token }
+            });
+            const shop = await res.json();
+            shopId = shop.id;
+            
+            document.getElementById('shopName').value = shop.shopName;
+            document.getElementById('shopDescription').value = shop.description;
+            document.getElementById('shopAddress').value = shop.address;
+        }
+        
+        async function updateShop(e) {
+            e.preventDefault();
+            const data = {
+                shopName: document.getElementById('shopName').value,
+                description: document.getElementById('shopDescription').value,
+                address: document.getElementById('shopAddress').value
+            };
+            
+            const res = await fetch('/api/owner/my-shop', {
+                method: 'PUT',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'Authorization': 'Bearer ' + token
+                },
+                body: JSON.stringify(data)
+            });
+            
+            if (res.ok) alert('Shop updated successfully!');
+        }
+        
+        async function loadMenuItems() {
+            if (!shopId) await loadShop();
+            
+            const res = await fetch('/api/shops/' + shopId + '/menu');
+            const items = await res.json();
+            
+            if (items.length === 0) {
+                document.getElementById('menuItems').innerHTML = '<p>No menu items yet. Add your first item above!</p>';
+            } else {
+                document.getElementById('menuItems').innerHTML = items.map(function(item) {
+                    return '<div class="menu-item">' +
+                        '<div class="menu-item-info">' +
+                        '<h3>' + item.name + '</h3>' +
+                        '<p>' + item.description + '</p>' +
+                        '<p><strong>₹' + item.price + '</strong></p>' +
+                        '</div>' +
+                        '<div class="menu-item-actions">' +
+                        '<button class="btn" onclick="openEditModal(' + item.id + ', \'' + escapeHtml(item.name) + '\', \'' + escapeHtml(item.description) + '\', ' + item.price + ', \'' + (item.imageUrl || '') + '\')">Edit</button>' +
+                        '<button class="btn btn-danger" onclick="deleteMenuItem(' + item.id + ')">Delete</button>' +
+                        '</div></div>';
+                }).join('');
+            }
+        }
+        
+        function escapeHtml(text) {
+            return text.replace(/'/g, "\\'").replace(/"/g, '&quot;');
+        }
+        
+        async function addMenuItem(e) {
+            e.preventDefault();
+            const imageFile = document.getElementById('itemImageFile').files[0];
+            let imageUrl = document.getElementById('itemImage').value;
+            
+            if (imageFile) {
+                imageUrl = 'data:image/jpeg;base64,' + await fileToBase64(imageFile);
+            }
+            
+            const data = {
+                name: document.getElementById('itemName').value,
+                description: document.getElementById('itemDescription').value,
+                price: parseFloat(document.getElementById('itemPrice').value),
+                imageUrl: imageUrl || null
+            };
+            
+            const res = await fetch('/api/owner/menu', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'Authorization': 'Bearer ' + token
+                },
+                body: JSON.stringify(data)
+            });
+            
+            if (res.ok) {
+                alert('Menu item added successfully!');
+                e.target.reset();
+                loadMenuItems();
+            }
+        }
+        
+        function openEditModal(id, name, description, price, imageUrl) {
+            document.getElementById('editItemId').value = id;
+            document.getElementById('editItemName').value = name;
+            document.getElementById('editItemDescription').value = description;
+            document.getElementById('editItemPrice').value = price;
+            document.getElementById('editItemImage').value = imageUrl || '';
+            document.getElementById('editModal').style.display = 'block';
+        }
+        
+        function closeEditModal() {
+            document.getElementById('editModal').style.display = 'none';
+        }
+        
+        async function saveEdit(e) {
+            e.preventDefault();
+            const id = document.getElementById('editItemId').value;
+            const imageFile = document.getElementById('editItemImageFile').files[0];
+            let imageUrl = document.getElementById('editItemImage').value;
+            
+            if (imageFile) {
+                imageUrl = 'data:image/jpeg;base64,' + await fileToBase64(imageFile);
+            }
+            
+            const data = {
+                name: document.getElementById('editItemName').value,
+                description: document.getElementById('editItemDescription').value,
+                price: parseFloat(document.getElementById('editItemPrice').value),
+                imageUrl: imageUrl || null
+            };
+            
+            const res = await fetch('/api/owner/menu/' + id, {
+                method: 'PUT',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'Authorization': 'Bearer ' + token
+                },
+                body: JSON.stringify(data)
+            });
+            
+            if (res.ok) {
+                alert('Menu item updated successfully!');
+                closeEditModal();
+                loadMenuItems();
+            }
+        }
+        
+        async function deleteMenuItem(id) {
+            if (!confirm('Are you sure you want to delete this menu item?')) return;
+            
+            const res = await fetch('/api/owner/menu/' + id, {
+                method: 'DELETE',
+                headers: { 'Authorization': 'Bearer ' + token }
+            });
+            
+            if (res.ok) {
+                alert('Menu item deleted successfully!');
+                loadMenuItems();
+            } else {
+                alert('Failed to delete menu item');
+            }
+        }
+        
+        async function loadOrders() {
+            const ordersRes = await fetch('/api/owner/orders', {
+                headers: { 'Authorization': 'Bearer ' + token }
+            });
+            const orders = await ordersRes.json();
+            
+            if (orders.length === 0) {
+                document.getElementById('orders').innerHTML = '<p>No orders yet.</p>';
+            } else {
+                document.getElementById('orders').innerHTML = orders.map(function(order) {
+                    const isDelivered = order.status === 'DELIVERED';
+                    return '<div class="order ' + (isDelivered ? 'delivered' : '') + '">' +
+                        '<p><strong>Order #' + order.id + '</strong> - ₹' + order.totalAmount + ' - ' + order.status + '</p>' +
+                        '<p>Items: ' + order.items.map(function(i) { return i.menuItemName + ' (x' + i.quantity + ')'; }).join(', ') + '</p>' +
+                        (isDelivered ? 
+                            '<p style="color: #27ae60; font-weight: bold;">✓ Delivery Completed - Cannot be changed</p>' :
+                            '<button class="btn" onclick="updateStatus(' + order.id + ', \'PREPARING\')">Preparing</button>' +
+                            '<button class="btn" onclick="updateStatus(' + order.id + ', \'READY\')">Ready</button>' +
+                            '<button class="btn btn-success" onclick="updateStatus(' + order.id + ', \'DELIVERED\')">Mark Delivered</button>'
+                        ) +
+                        '</div>';
+                }).join('');
+            }
+        }
+        
+        async function updateStatus(orderId, status) {
+            await fetch('/api/owner/orders/' + orderId + '/status', {
+                method: 'PUT',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'Authorization': 'Bearer ' + token
+                },
+                body: JSON.stringify({ status: status })
+            });
+            loadOrders();
+            loadStats();
+        }
+        
+        function fileToBase64(file) {
+            return new Promise((resolve, reject) => {
+                const reader = new FileReader();
+                reader.readAsDataURL(file);
+                reader.onload = () => resolve(reader.result.split(',')[1]);
+                reader.onerror = error => reject(error);
+            });
+        }
+        
+        function logout() {
+            localStorage.clear();
+            window.location.href = '/';
+        }
+        
+        loadDashboard();
+    </script>
+</body>
+</html>
