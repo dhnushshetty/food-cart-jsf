@@ -142,6 +142,7 @@ public class CartService {
                 cartItem.getMenuItemId(),
                 menuItem.getName(),
                 menuItem.getPrice(),
-                cartItem.getQuantity());
+                cartItem.getQuantity(),
+                menuItem.getImageUrl());
     }
 }

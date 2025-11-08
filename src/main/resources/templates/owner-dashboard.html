@@ -15,7 +15,9 @@
         .form-group { margin-bottom: 1rem; }
         .form-group label { display: block; margin-bottom: 0.5rem; font-weight: bold; }
         .form-group input, .form-group textarea { width: 100%; padding: 0.5rem; border: 1px solid #ddd; border-radius: 4px; }
-        .menu-item { padding: 1rem; border-bottom: 1px solid #eee; display: flex; justify-content: space-between; align-items: center; }
+        .menu-item { padding: 1rem; border-bottom: 1px solid #eee; display: flex; gap: 1rem; align-items: center; }
+        .menu-item-image { width: 60px; height: 60px; object-fit: cover; border-radius: 8px; flex-shrink: 0; }
+        .menu-item-image-placeholder { width: 60px; height: 60px; background: #e0e0e0; border-radius: 8px; display: flex; align-items: center; justify-content: center; font-size: 1.5rem; flex-shrink: 0; }
         .menu-item-info { flex: 1; }
         .menu-item-actions { display: flex; gap: 0.5rem; }
         .order { padding: 1rem; border-bottom: 1px solid #eee; margin-bottom: 1rem; background: #f8f9fa; border-radius: 4px; }
@@ -213,7 +215,13 @@
                 document.getElementById('menuItems').innerHTML = '<p>No menu items yet. Add your first item above!</p>';
             } else {
                 document.getElementById('menuItems').innerHTML = items.map(function(item) {
+                    const imageHtml = item.imageUrl ? 
+                        '<img src="' + item.imageUrl + '" alt="' + item.name + '" class="menu-item-image" onerror="this.style.display=\'none\'; this.nextElementSibling.style.display=\'flex\';">' +
+                        '<div class="menu-item-image-placeholder" style="display:none;">🍽️</div>' :
+                        '<div class="menu-item-image-placeholder">🍽️</div>';
+                    
                     return '<div class="menu-item">' +
+                        imageHtml +
                         '<div class="menu-item-info">' +
                         '<h3>' + item.name + '</h3>' +
                         '<p>' + item.description + '</p>' +

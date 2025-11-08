@@ -10,10 +10,11 @@ import java.math.BigDecimal;
 @NoArgsConstructor
 @AllArgsConstructor
 public class CartItemDTO {
-    
+
     private Long id;
     private Long menuItemId;
     private String menuItemName;
     private BigDecimal price;
     private Integer quantity;
+    private String imageUrl;
 }
