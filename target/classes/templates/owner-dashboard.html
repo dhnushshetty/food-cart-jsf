@@ -378,8 +378,10 @@
             } else {
                 document.getElementById('orders').innerHTML = orders.map(function(order) {
                     const isDelivered = order.status === 'DELIVERED';
+                    const customerName = order.customerUsername || 'Guest';
                     return '<div class="order ' + (isDelivered ? 'delivered' : '') + '">' +
                         '<p><strong>Order #' + order.id + '</strong> - ₹' + order.totalAmount + ' - ' + order.status + '</p>' +
+                        '<p><strong>Customer:</strong> ' + customerName + '</p>' +
                         '<p>Items: ' + order.items.map(function(i) { return i.menuItemName + ' (x' + i.quantity + ')'; }).join(', ') + '</p>' +
                         (isDelivered ? 
                             '<p style="color: #27ae60; font-weight: bold;">✓ Delivery Completed - Cannot be changed</p>' :
