@@ -4,127 +4,336 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Register - Food Cart Platform</title>
+    <link rel="stylesheet" href="/css/main.css">
+    <link rel="stylesheet" href="/css/animations.css">
+    <link rel="stylesheet" href="/css/components.css">
     <style>
-        * { margin: 0; padding: 0; box-sizing: border-box; }
-        body { font-family: Arial, sans-serif; background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); min-height: 100vh; display: flex; align-items: center; justify-content: center; padding: 2rem; }
-        .container { background: white; padding: 2rem; border-radius: 8px; box-shadow: 0 4px 6px rgba(0,0,0,0.1); width: 100%; max-width: 500px; }
-        h2 { color: #2c3e50; margin-bottom: 1.5rem; text-align: center; }
-        .tabs { display: flex; margin-bottom: 2rem; }
-        .tab { flex: 1; padding: 1rem; text-align: center; background: #ecf0f1; cursor: pointer; border: none; font-size: 1rem; font-weight: bold; }
-        .tab.active { background: #667eea; color: white; }
-        .form-group { margin-bottom: 1rem; }
-        label { display: block; margin-bottom: 0.5rem; color: #2c3e50; font-weight: bold; }
-        input, textarea { width: 100%; padding: 0.8rem; border: 1px solid #ddd; border-radius: 4px; font-size: 1rem; }
-        textarea { resize: vertical; min-height: 80px; }
-        input:focus, textarea:focus { outline: none; border-color: #667eea; }
-        .btn { width: 100%; padding: 0.8rem; background: #667eea; color: white; border: none; border-radius: 4px; font-size: 1rem; font-weight: bold; cursor: pointer; margin-top: 1rem; }
-        .btn:hover { background: #5568d3; }
-        .error { color: #e74c3c; margin-top: 1rem; text-align: center; display: none; }
-        .success { color: #27ae60; margin-top: 1rem; text-align: center; display: none; }
-        .links { text-align: center; margin-top: 1rem; }
-        .links a { color: #667eea; text-decoration: none; }
-        .hidden { display: none; }
+        body {
+            background: linear-gradient(135deg, var(--primary-600) 0%, var(--secondary-600) 100%);
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: var(--space-4);
+        }
+        .auth-container {
+            background: white;
+            padding: var(--space-8);
+            border-radius: var(--radius-xl);
+            box-shadow: var(--shadow-xl);
+            width: 100%;
+            max-width: 550px;
+            animation: scaleIn 0.3s ease-out;
+        }
+        .auth-header {
+            text-align: center;
+            margin-bottom: var(--space-6);
+        }
+        .auth-logo {
+            font-size: var(--text-5xl);
+            margin-bottom: var(--space-3);
+        }
+        .auth-title {
+            font-size: var(--text-3xl);
+            font-weight: var(--font-bold);
+            color: var(--gray-900);
+            margin-bottom: var(--space-2);
+        }
+        .auth-subtitle {
+            color: var(--gray-600);
+            font-size: var(--text-base);
+        }
+        .password-toggle {
+            position: absolute;
+            right: var(--space-4);
+            top: 50%;
+            transform: translateY(-50%);
+            background: none;
+            border: none;
+            color: var(--gray-500);
+            cursor: pointer;
+            font-size: var(--text-lg);
+            padding: var(--space-2);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            height: 40px;
+        }
+        .password-toggle:hover {
+            color: var(--gray-700);
+        }
+        .auth-links {
+            text-align: center;
+            margin-top: var(--space-6);
+            color: var(--gray-600);
+        }
+        .auth-links a {
+            color: var(--primary-600);
+            font-weight: var(--font-semibold);
+        }
+        .auth-links a:hover {
+            color: var(--primary-700);
+            text-decoration: underline;
+        }
+        .divider {
+            margin: var(--space-6) 0;
+        }
     </style>
 </head>
 <body>
-    <div class="container">
-        <h2>🍕 Register</h2>
-        <div class="tabs">
-            <button class="tab active" onclick="showTab('customer')">Customer</button>
-            <button class="tab" onclick="showTab('owner')">Shop Owner</button>
+    <div class="auth-container">
+        <div class="auth-header">
+            <div class="auth-logo">🍕</div>
+            <h1 class="auth-title">Create Account</h1>
+            <p class="auth-subtitle">Join Food Cart Platform today</p>
         </div>
         
-        <form id="customerForm">
-            <div class="form-group">
-                <label for="c_username">Username</label>
-                <input type="text" id="c_username" required>
-            </div>
-            <div class="form-group">
-                <label for="c_email">Email</label>
-                <input type="email" id="c_email" required>
-            </div>
-            <div class="form-group">
-                <label for="c_password">Password</label>
-                <input type="password" id="c_password" required>
-            </div>
-            <button type="submit" class="btn">Register as Customer</button>
-        </form>
+        <!-- Tab Navigation -->
+        <div class="tabs">
+            <ul class="tabs-list">
+                <li><button class="tab-button active" data-tab="customer">Customer</button></li>
+                <li><button class="tab-button" data-tab="owner">Shop Owner</button></li>
+            </ul>
+        </div>
         
-        <form id="ownerForm" class="hidden">
-            <div class="form-group">
-                <label for="o_username">Username</label>
-                <input type="text" id="o_username">
-            </div>
-            <div class="form-group">
-                <label for="o_email">Email</label>
-                <input type="email" id="o_email">
-            </div>
-            <div class="form-group">
-                <label for="o_password">Password</label>
-                <input type="password" id="o_password">
-            </div>
-            <div class="form-group">
-                <label for="shopName">Shop Name</label>
-                <input type="text" id="shopName">
-            </div>
-            <div class="form-group">
-                <label for="description">Description</label>
-                <textarea id="description"></textarea>
-            </div>
-            <div class="form-group">
-                <label for="address">Address</label>
-                <input type="text" id="address">
-            </div>
-            <button type="submit" class="btn">Register as Owner</button>
-        </form>
+        <!-- Customer Registration Form -->
+        <div id="customerTab" class="tab-content active">
+            <form id="customerForm">
+                <div class="form-group">
+                    <label for="c_username" class="form-label">Username</label>
+                    <input 
+                        type="text" 
+                        id="c_username" 
+                        class="form-input" 
+                        placeholder="Choose a username"
+                        required
+                        autocomplete="username">
+                    <span class="form-error"></span>
+                </div>
+                
+                <div class="form-group">
+                    <label for="c_email" class="form-label">Email</label>
+                    <input 
+                        type="email" 
+                        id="c_email" 
+                        class="form-input" 
+                        placeholder="your.email@example.com"
+                        required
+                        autocomplete="email">
+                    <span class="form-error"></span>
+                </div>
+                
+                <div class="form-group" style="position: relative;">
+                    <label for="c_password" class="form-label">Password</label>
+                    <input 
+                        type="password" 
+                        id="c_password" 
+                        class="form-input" 
+                        placeholder="Create a strong password"
+                        required
+                        autocomplete="new-password">
+                    <button type="button" class="password-toggle" onclick="togglePassword('c_password', 'c_toggleIcon')">
+                        <span id="c_toggleIcon">👁️</span>
+                    </button>
+                    <span class="form-error"></span>
+                </div>
+                
+                <button type="submit" class="btn btn-primary" style="width: 100%; margin-top: var(--space-6);">
+                    Register as Customer
+                </button>
+            </form>
+        </div>
         
-        <div class="error" id="error"></div>
-        <div class="success" id="success"></div>
-        <div class="links">
+        <!-- Owner Registration Form -->
+        <div id="ownerTab" class="tab-content">
+            <form id="ownerForm">
+                <div class="form-group">
+                    <label for="o_username" class="form-label">Username</label>
+                    <input 
+                        type="text" 
+                        id="o_username" 
+                        class="form-input" 
+                        placeholder="Choose a username"
+                        autocomplete="username">
+                    <span class="form-error"></span>
+                </div>
+                
+                <div class="form-group">
+                    <label for="o_email" class="form-label">Email</label>
+                    <input 
+                        type="email" 
+                        id="o_email" 
+                        class="form-input" 
+                        placeholder="your.email@example.com"
+                        autocomplete="email">
+                    <span class="form-error"></span>
+                </div>
+                
+                <div class="form-group" style="position: relative;">
+                    <label for="o_password" class="form-label">Password</label>
+                    <input 
+                        type="password" 
+                        id="o_password" 
+                        class="form-input" 
+                        placeholder="Create a strong password"
+                        autocomplete="new-password">
+                    <button type="button" class="password-toggle" onclick="togglePassword('o_password', 'o_toggleIcon')">
+                        <span id="o_toggleIcon">👁️</span>
+                    </button>
+                    <span class="form-error"></span>
+                </div>
+                
+                <div class="form-group">
+                    <label for="shopName" class="form-label">Shop Name</label>
+                    <input 
+                        type="text" 
+                        id="shopName" 
+                        class="form-input" 
+                        placeholder="Your shop name">
+                    <span class="form-error"></span>
+                </div>
+                
+                <div class="form-group">
+                    <label for="description" class="form-label">Description</label>
+                    <textarea 
+                        id="description" 
+                        class="form-textarea" 
+                        placeholder="Describe your shop and cuisine"></textarea>
+                    <span class="form-error"></span>
+                </div>
+                
+                <div class="form-group">
+                    <label for="address" class="form-label">Address</label>
+                    <input 
+                        type="text" 
+                        id="address" 
+                        class="form-input" 
+                        placeholder="Shop address">
+                    <span class="form-error"></span>
+                </div>
+                
+                <button type="submit" class="btn btn-primary" style="width: 100%; margin-top: var(--space-6);">
+                    Register as Shop Owner
+                </button>
+            </form>
+        </div>
+        
+        <div class="divider"></div>
+        
+        <div class="auth-links">
             <p>Already have an account? <a href="/login">Login here</a></p>
-            <p><a href="/">Back to Home</a></p>
+            <p style="margin-top: var(--space-2);"><a href="/">← Back to Home</a></p>
         </div>
     </div>
     
+    <!-- Scripts -->
+    <script src="/js/utils.js"></script>
+    <script src="/js/animations.js"></script>
+    <script src="/js/toast.js"></script>
     <script>
-        function showTab(type) {
-            const tabs = document.querySelectorAll('.tab');
-            tabs.forEach(t => t.classList.remove('active'));
-            event.target.classList.add('active');
+        // Tab switching
+        const tabButtons = document.querySelectorAll('.tab-button');
+        const tabContents = document.querySelectorAll('.tab-content');
+        
+        tabButtons.forEach(button => {
+            button.addEventListener('click', () => {
+                const tabName = button.dataset.tab;
+                
+                // Update active states
+                tabButtons.forEach(btn => btn.classList.remove('active'));
+                button.classList.add('active');
+                
+                // Show/hide content with animation
+                tabContents.forEach(content => {
+                    if (content.id === tabName + 'Tab') {
+                        content.classList.add('active');
+                    } else {
+                        content.classList.remove('active');
+                    }
+                });
+            });
+        });
+        
+        // Toggle password visibility
+        function togglePassword(inputId, iconId) {
+            const passwordInput = document.getElementById(inputId);
+            const toggleIcon = document.getElementById(iconId);
             
-            if (type === 'customer') {
-                document.getElementById('customerForm').classList.remove('hidden');
-                document.getElementById('ownerForm').classList.add('hidden');
+            if (passwordInput.type === 'password') {
+                passwordInput.type = 'text';
+                toggleIcon.textContent = '🙈';
             } else {
-                document.getElementById('customerForm').classList.add('hidden');
-                document.getElementById('ownerForm').classList.remove('hidden');
+                passwordInput.type = 'password';
+                toggleIcon.textContent = '👁️';
             }
         }
         
+        // Customer form submission
         document.getElementById('customerForm').addEventListener('submit', async (e) => {
             e.preventDefault();
-            const data = {
-                username: document.getElementById('c_username').value,
-                email: document.getElementById('c_email').value,
-                password: document.getElementById('c_password').value
-            };
-            await register('/api/auth/register/customer', data);
+            
+            const username = document.getElementById('c_username').value.trim();
+            const email = document.getElementById('c_email').value.trim();
+            const password = document.getElementById('c_password').value;
+            
+            // Validate
+            const isUsernameValid = validateField(document.getElementById('c_username'), validateUsername);
+            const isEmailValid = validateField(document.getElementById('c_email'), (val) => ({
+                isValid: isValidEmail(val),
+                message: isValidEmail(val) ? 'Valid email' : 'Please enter a valid email address'
+            }));
+            const isPasswordValid = validateField(document.getElementById('c_password'), validatePassword);
+            
+            if (!isUsernameValid || !isEmailValid || !isPasswordValid) {
+                shake(document.querySelector('.auth-container'));
+                return;
+            }
+            
+            const data = { username, email, password };
+            await register('/api/auth/register/customer', data, e.target);
         });
         
+        // Owner form submission
         document.getElementById('ownerForm').addEventListener('submit', async (e) => {
             e.preventDefault();
-            const data = {
-                username: document.getElementById('o_username').value,
-                email: document.getElementById('o_email').value,
-                password: document.getElementById('o_password').value,
-                shopName: document.getElementById('shopName').value,
-                description: document.getElementById('description').value,
-                address: document.getElementById('address').value
-            };
-            await register('/api/auth/register/owner', data);
+            
+            const username = document.getElementById('o_username').value.trim();
+            const email = document.getElementById('o_email').value.trim();
+            const password = document.getElementById('o_password').value;
+            const shopName = document.getElementById('shopName').value.trim();
+            const description = document.getElementById('description').value.trim();
+            const address = document.getElementById('address').value.trim();
+            
+            // Validate
+            const isUsernameValid = validateField(document.getElementById('o_username'), validateUsername);
+            const isEmailValid = validateField(document.getElementById('o_email'), (val) => ({
+                isValid: isValidEmail(val),
+                message: isValidEmail(val) ? 'Valid email' : 'Please enter a valid email address'
+            }));
+            const isPasswordValid = validateField(document.getElementById('o_password'), validatePassword);
+            
+            if (!isUsernameValid || !isEmailValid || !isPasswordValid) {
+                shake(document.querySelector('.auth-container'));
+                return;
+            }
+            
+            if (!shopName || !description || !address) {
+                toast.warning('Please fill in all shop details');
+                shake(document.querySelector('.auth-container'));
+                return;
+            }
+            
+            const data = { username, email, password, shopName, description, address };
+            await register('/api/auth/register/owner', data, e.target);
         });
         
-        async function register(url, data) {
+        // Register function
+        async function register(url, data, form) {
+            const submitBtn = form.querySelector('button[type="submit"]');
+            const originalText = submitBtn.textContent;
+            submitBtn.disabled = true;
+            submitBtn.innerHTML = '<span class="spinner spinner-sm"></span> Registering...';
+            
             try {
                 const response = await fetch(url, {
                     method: 'POST',
@@ -133,20 +342,33 @@
                 });
                 
                 if (response.ok) {
-                    document.getElementById('success').textContent = 'Registration successful! Redirecting to login...';
-                    document.getElementById('success').style.display = 'block';
-                    document.getElementById('error').style.display = 'none';
+                    toast.success('Registration successful! Redirecting to login...');
                     setTimeout(() => window.location.href = '/login', 2000);
                 } else {
                     const error = await response.text();
-                    document.getElementById('error').textContent = error || 'Registration failed';
-                    document.getElementById('error').style.display = 'block';
+                    toast.error(error || 'Registration failed. Please try again.');
+                    shake(document.querySelector('.auth-container'));
+                    submitBtn.disabled = false;
+                    submitBtn.textContent = originalText;
                 }
             } catch (error) {
-                document.getElementById('error').textContent = 'Registration failed. Please try again.';
-                document.getElementById('error').style.display = 'block';
+                console.error('Registration error:', error);
+                toast.error('Registration failed. Please check your connection and try again.');
+                shake(document.querySelector('.auth-container'));
+                submitBtn.disabled = false;
+                submitBtn.textContent = originalText;
             }
         }
+        
+        // Add input animations
+        document.querySelectorAll('.form-input, .form-textarea').forEach(input => {
+            input.addEventListener('focus', () => {
+                input.parentElement.classList.add('animate-pulse');
+                setTimeout(() => {
+                    input.parentElement.classList.remove('animate-pulse');
+                }, 300);
+            });
+        });
     </script>
 </body>
 </html>

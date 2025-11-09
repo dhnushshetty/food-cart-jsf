@@ -13,10 +13,11 @@ import java.util.List;
 @NoArgsConstructor
 @AllArgsConstructor
 public class OrderDTO {
-    
+
     private Long id;
     private Long shopId;
     private String shopName;
+    private String customerUsername;
     private BigDecimal totalAmount;
     private OrderStatus status;
     private LocalDateTime createdAt;
