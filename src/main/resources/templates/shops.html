@@ -4,207 +4,315 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Browse Shops - Food Cart Platform</title>
-    <style>
-        * { margin: 0; padding: 0; box-sizing: border-box; }
-        body { font-family: Arial, sans-serif; background: #f5f5f5; }
-        .navbar { background: #2c3e50; color: white; padding: 1rem 2rem; display: flex; justify-content: space-between; align-items: center; }
-        .navbar h1 { font-size: 1.5rem; }
-        .navbar a { color: white; text-decoration: none; margin-left: 1rem; padding: 0.5rem 1rem; border-radius: 4px; }
-        .navbar a:hover { background: #34495e; }
-        .container { max-width: 1200px; margin: 2rem auto; padding: 0 2rem; }
-        h2 { color: #2c3e50; margin-bottom: 2rem; }
-        .shops-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(300px, 1fr)); gap: 2rem; }
-        .shop-card { background: white; border-radius: 8px; padding: 1.5rem; box-shadow: 0 2px 4px rgba(0,0,0,0.1); cursor: pointer; transition: transform 0.2s; }
-        .shop-card:hover { transform: translateY(-4px); box-shadow: 0 4px 8px rgba(0,0,0,0.2); }
-        .shop-card h3 { color: #2c3e50; margin-bottom: 0.5rem; }
-        .shop-card p { color: #7f8c8d; margin-bottom: 0.5rem; }
-        .shop-card .address { color: #95a5a6; font-size: 0.9rem; }
-        .modal { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.5); z-index: 1000; }
-        .modal-content { background: white; margin: 2rem auto; padding: 2rem; border-radius: 8px; max-width: 800px; max-height: 80vh; overflow-y: auto; }
-        .modal-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 1.5rem; }
-        .close { font-size: 2rem; cursor: pointer; color: #7f8c8d; }
-        .menu-item { background: #f8f9fa; padding: 1rem; margin-bottom: 1rem; border-radius: 4px; display: flex; gap: 1rem; align-items: center; }
-        .menu-item-image { width: 80px; height: 80px; object-fit: cover; border-radius: 8px; flex-shrink: 0; }
-        .menu-item-image-placeholder { width: 80px; height: 80px; background: #e0e0e0; border-radius: 8px; display: flex; align-items: center; justify-content: center; font-size: 2rem; flex-shrink: 0; }
-        .menu-item-info { flex: 1; }
-        .menu-item-info h4 { color: #2c3e50; margin-bottom: 0.5rem; }
-        .menu-item-info p { color: #7f8c8d; font-size: 0.9rem; }
-        .menu-item-price { font-size: 1.2rem; font-weight: bold; color: #27ae60; }
-        .menu-item-actions { display: flex; align-items: center; gap: 0.5rem; }
-        .quantity-input { width: 60px; padding: 0.3rem; border: 1px solid #ddd; border-radius: 4px; text-align: center; }
-        .btn { padding: 0.5rem 1rem; background: #667eea; color: white; border: none; border-radius: 4px; cursor: pointer; }
-        .btn:hover { background: #5568d3; }
-        .toast { position: fixed; top: 20px; right: 20px; padding: 1rem 1.5rem; border-radius: 4px; box-shadow: 0 4px 12px rgba(0,0,0,0.15); z-index: 9999; display: none; animation: slideIn 0.3s ease-out; }
-        .toast.success { background: #d4edda; color: #155724; border-left: 4px solid #28a745; }
-        .toast.error { background: #f8d7da; color: #721c24; border-left: 4px solid #dc3545; }
-        @keyframes slideIn { from { transform: translateX(400px); opacity: 0; } to { transform: translateX(0); opacity: 1; } }
-        @keyframes slideOut { from { transform: translateX(0); opacity: 1; } to { transform: translateX(400px); opacity: 0; } }
-    </style>
+    <link rel="stylesheet" href="/css/main.css">
+    <link rel="stylesheet" href="/css/animations.css">
+    <link rel="stylesheet" href="/css/components.css">
 </head>
 <body>
+    <!-- Navigation Bar -->
     <nav class="navbar">
-        <h1>🍕 Food Cart Platform</h1>
-        <div id="navLinks"></div>
+        <div class="navbar-container">
+            <a href="/" class="navbar-brand">🍕 Food Cart Platform</a>
+            <div class="navbar-links" id="navLinks"></div>
+        </div>
     </nav>
     
-    <div class="container">
-        <h2>Browse Shops</h2>
-        <div class="shops-grid" id="shopsGrid"></div>
-    </div>
-    
-    <div id="toast" class="toast"></div>
-    
-    <div id="menuModal" class="modal">
-        <div class="modal-content">
-            <div class="modal-header">
-                <h2 id="modalShopName"></h2>
-                <span class="close" onclick="closeModal()">&times;</span>
-            </div>
-            <div id="menuItems"></div>
+    <!-- Main Content -->
+    <div class="container py-8">
+        <!-- Personalized Greeting -->
+        <div id="customerGreeting" style="display: none; margin-bottom: 2rem; padding: 2rem; background: linear-gradient(135deg, var(--primary-700) 0%, var(--secondary-700) 100%); border-radius: var(--radius-xl); text-align: center;">
+            <h2 class="text-3xl font-bold mb-2 text-white animate-fade-in" id="greetingText"></h2>
+            <p class="text-lg text-white" style="opacity: 0.9;">Discover delicious food from local vendors</p>
+        </div>
+        
+        <h1 class="text-4xl font-bold mb-8">Browse Shops</h1>
+        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6" id="shopsGrid">
+            <!-- Shops will be loaded here -->
         </div>
     </div>
     
+    <!-- Menu Modal -->
+    <div id="menuModal" class="modal">
+        <div class="modal-backdrop"></div>
+        <div class="modal-content animate-slide-in-up">
+            <div class="modal-header">
+                <h2 class="modal-title" id="modalShopName"></h2>
+                <button class="modal-close" onclick="closeMenuModal()">&times;</button>
+            </div>
+            <div class="modal-body" id="menuItems">
+                <!-- Menu items will be loaded here -->
+            </div>
+        </div>
+    </div>
+    
+    <!-- Scripts -->
+    <script src="/js/utils.js"></script>
+    <script src="/js/animations.js"></script>
+    <script src="/js/toast.js"></script>
     <script>
-        const token = localStorage.getItem('token');
-        const role = localStorage.getItem('role');
+        const auth = getAuthState();
         
         // Update navigation
         const navLinks = document.getElementById('navLinks');
-        if (token) {
-            navLinks.innerHTML = `
-                <a href="/cart">🛒 Cart</a>
-                <a href="/orders">📦 Orders</a>
-                <a href="#" onclick="logout()">Logout</a>
-            `;
+        if (auth.isAuthenticated) {
+            if (auth.isCustomer) {
+                navLinks.innerHTML = `
+                    <a href="/shops" class="navbar-link active">Browse Shops</a>
+                    <a href="/cart" class="navbar-link cart-badge">🛒 Cart</a>
+                    <a href="/orders" class="navbar-link">📦 Orders</a>
+                    <a href="#" class="navbar-link" onclick="logout()">Logout</a>
+                `;
+                refreshCartBadge();
+                
+                // Show personalized greeting
+                showCustomerGreeting();
+            } else if (auth.isOwner) {
+                navLinks.innerHTML = `
+                    <a href="/owner/dashboard" class="navbar-link">📊 Dashboard</a>
+                    <a href="#" class="navbar-link" onclick="logout()">Logout</a>
+                `;
+            }
         } else {
             navLinks.innerHTML = `
-                <a href="/login">Login</a>
-                <a href="/register">Register</a>
+                <a href="/shops" class="navbar-link active">Browse Shops</a>
+                <a href="/login" class="navbar-link">Login</a>
+                <a href="/register" class="navbar-link">Register</a>
             `;
         }
         
-        // Load shops
+        // Show personalized greeting for customers
+        function showCustomerGreeting() {
+            const username = auth.username || 'Guest';
+            const greetingContainer = document.getElementById('customerGreeting');
+            const greetingText = document.getElementById('greetingText');
+            
+            // Get time-based greeting
+            const hour = new Date().getHours();
+            let timeGreeting = 'Hello';
+            if (hour < 12) {
+                timeGreeting = 'Good Morning';
+            } else if (hour < 18) {
+                timeGreeting = 'Good Afternoon';
+            } else {
+                timeGreeting = 'Good Evening';
+            }
+            
+            // Set greeting text
+            greetingText.textContent = `${timeGreeting}, ${username}! What would you like to order today?`;
+            
+            // Show greeting with animation
+            greetingContainer.style.display = 'block';
+            greetingContainer.classList.add('animate-slide-in-down');
+        }
+        
+        // Load shops with skeleton loading
         async function loadShops() {
+            const grid = document.getElementById('shopsGrid');
+            
+            // Show skeleton loading
+            showSkeletonLoading(grid, 6);
+            
             try {
                 const response = await fetch('/api/shops');
                 const shops = await response.json();
-                const grid = document.getElementById('shopsGrid');
                 
                 if (shops.length === 0) {
-                    grid.innerHTML = '<p>No shops available yet.</p>';
+                    grid.innerHTML = `
+                        <div class="empty-state" style="grid-column: 1 / -1;">
+                            <div class="empty-state-icon">🏪</div>
+                            <h2 class="empty-state-title">No Shops Available</h2>
+                            <p class="empty-state-description">Check back later for new food vendors</p>
+                        </div>
+                    `;
                     return;
                 }
                 
+                // Render shops
                 grid.innerHTML = shops.map(shop => `
-                    <div class="shop-card" onclick="viewMenu(${shop.id}, '${shop.shopName}')">
-                        <h3>${shop.shopName}</h3>
-                        <p>${shop.description}</p>
-                        <p class="address">📍 ${shop.address}</p>
+                    <div class="card hover-lift animate-fade-in" onclick="viewMenu(${shop.id}, '${escapeHtml(shop.shopName)}')">
+                        <div class="card-image" style="position: relative; overflow: hidden;">
+                            ${shop.imageUrl ? 
+                                `<img src="${shop.imageUrl}" alt="${escapeHtml(shop.shopName)}" style="width: 100%; height: 100%; object-fit: cover;" onerror="this.style.display='none'; this.nextElementSibling.style.display='flex';">
+                                <div style="display:none; background: linear-gradient(135deg, var(--primary-600) 0%, var(--secondary-600) 100%); width: 100%; height: 100%; align-items: center; justify-content: center; font-size: 4rem;">🏪</div>` :
+                                `<div style="display: flex; background: linear-gradient(135deg, var(--primary-600) 0%, var(--secondary-600) 100%); width: 100%; height: 100%; align-items: center; justify-content: center; font-size: 4rem;">🏪</div>`
+                            }
+                        </div>
+                        <div class="card-content">
+                            <h3 class="card-title">${escapeHtml(shop.shopName)}</h3>
+                            <p class="card-description">${escapeHtml(shop.description)}</p>
+                            <p class="text-gray-600 text-sm mt-2">📍 ${escapeHtml(shop.address)}</p>
+                        </div>
                     </div>
                 `).join('');
+                
+                // Stagger fade-in animation
+                const cards = grid.querySelectorAll('.card');
+                fadeInStagger(cards, 100);
+                
             } catch (error) {
                 console.error('Error loading shops:', error);
+                grid.innerHTML = `
+                    <div class="empty-state" style="grid-column: 1 / -1;">
+                        <div class="empty-state-icon">⚠️</div>
+                        <h2 class="empty-state-title">Error Loading Shops</h2>
+                        <p class="empty-state-description">Please try again later</p>
+                    </div>
+                `;
+                toast.error('Failed to load shops. Please try again.');
             }
         }
         
+        // View menu modal
         async function viewMenu(shopId, shopName) {
+            const modal = document.getElementById('menuModal');
+            const menuItems = document.getElementById('menuItems');
+            
+            document.getElementById('modalShopName').textContent = shopName;
+            
+            // Show loading
+            showSpinner(menuItems);
+            openModal(modal);
+            
             try {
                 const response = await fetch(`/api/shops/${shopId}/menu`);
                 const menu = await response.json();
                 
-                document.getElementById('modalShopName').textContent = shopName;
-                const menuItems = document.getElementById('menuItems');
-                
                 if (menu.length === 0) {
-                    menuItems.innerHTML = '<p>No menu items available.</p>';
-                } else {
-                    menuItems.innerHTML = menu.map(item => `
-                        <div class="menu-item" data-item-name="${item.name}">
-                            ${item.imageUrl ? 
-                                `<img src="${item.imageUrl}" alt="${item.name}" class="menu-item-image" onerror="this.style.display='none'; this.nextElementSibling.style.display='flex';">
-                                <div class="menu-item-image-placeholder" style="display:none;">🍽️</div>` :
-                                `<div class="menu-item-image-placeholder">🍽️</div>`
-                            }
-                            <div class="menu-item-info">
-                                <h4>${item.name}</h4>
-                                <p>${item.description}</p>
-                            </div>
-                            <div class="menu-item-actions">
-                                <span class="menu-item-price">₹${item.price}</span>
-                                ${token && role === 'ROLE_CUSTOMER' ? `
-                                    <input type="number" id="qty-${item.id}" class="quantity-input" value="1" min="1" max="99">
-                                    <button class="btn" onclick="addToCart(${item.id}, '${item.name.replace(/'/g, "\\'")}')">Add to Cart</button>
-                                ` : ''}
-                            </div>
+                    menuItems.innerHTML = `
+                        <div class="empty-state">
+                            <div class="empty-state-icon">🍽️</div>
+                            <h3 class="empty-state-title">No Menu Items</h3>
+                            <p class="empty-state-description">This shop hasn't added any items yet</p>
                         </div>
-                    `).join('');
+                    `;
+                    return;
                 }
                 
-                document.getElementById('menuModal').style.display = 'block';
+                menuItems.innerHTML = menu.map(item => `
+                    <div class="card card-flat mb-4 animate-fade-in" style="display: flex; flex-direction: row; align-items: center; gap: 1.5rem; padding: 1.5rem; background: linear-gradient(135deg, #1e293b 0%, #2d3748 100%);">
+                        ${item.imageUrl ? 
+                            `<img src="${item.imageUrl}" alt="${escapeHtml(item.name)}" class="menu-item-image" style="width: 100px; height: 100px; object-fit: cover; border-radius: var(--radius-lg); flex-shrink: 0; border: 2px solid rgba(79, 70, 229, 0.3);" onerror="this.style.display='none'; this.nextElementSibling.style.display='flex';">
+                            <div class="menu-item-image-placeholder" style="display:none; width: 100px; height: 100px; background: rgba(79, 70, 229, 0.2); border-radius: var(--radius-lg); align-items: center; justify-content: center; font-size: 2.5rem; flex-shrink: 0; border: 2px solid rgba(79, 70, 229, 0.3);">🍽️</div>` :
+                            `<div class="menu-item-image-placeholder" style="display: flex; width: 100px; height: 100px; background: rgba(79, 70, 229, 0.2); border-radius: var(--radius-lg); align-items: center; justify-content: center; font-size: 2.5rem; flex-shrink: 0; border: 2px solid rgba(79, 70, 229, 0.3);">🍽️</div>`
+                        }
+                        <div style="flex: 1;">
+                            <h4 class="text-xl font-bold mb-2" style="color: var(--gray-100);">${escapeHtml(item.name)}</h4>
+                            <p class="mb-2" style="color: var(--gray-400); line-height: 1.6;">${escapeHtml(item.description)}</p>
+                            <p class="text-2xl font-bold" style="color: var(--success);">₹${item.price}</p>
+                        </div>
+                        ${auth.isCustomer ? `
+                            <div style="display: flex; flex-direction: column; gap: 0.75rem; align-items: center;">
+                                <div class="quantity-selector">
+                                    <button class="quantity-btn" onclick="decrementQty(${item.id})">−</button>
+                                    <span class="quantity-value" id="qty-${item.id}">1</span>
+                                    <button class="quantity-btn" onclick="incrementQty(${item.id})">+</button>
+                                </div>
+                                <button class="btn btn-primary btn-sm" onclick="addToCart(event, ${item.id}, '${escapeHtml(item.name).replace(/'/g, "\\'")}')">
+                                    Add to Cart
+                                </button>
+                            </div>
+                        ` : ''}
+                    </div>
+                `).join('');
+                
             } catch (error) {
                 console.error('Error loading menu:', error);
+                menuItems.innerHTML = `
+                    <div class="empty-state">
+                        <div class="empty-state-icon">⚠️</div>
+                        <h3 class="empty-state-title">Error Loading Menu</h3>
+                        <p class="empty-state-description">Please try again</p>
+                    </div>
+                `;
+                toast.error('Failed to load menu. Please try again.');
             }
         }
         
-        function showToast(message, type) {
-            const toast = document.getElementById('toast');
-            toast.textContent = message;
-            toast.className = 'toast ' + type;
-            toast.style.display = 'block';
-            
-            setTimeout(() => {
-                toast.style.animation = 'slideOut 0.3s ease-out';
-                setTimeout(() => {
-                    toast.style.display = 'none';
-                    toast.style.animation = 'slideIn 0.3s ease-out';
-                }, 300);
-            }, 3000);
+        // Quantity controls
+        function incrementQty(itemId) {
+            const qtyElement = document.getElementById('qty-' + itemId);
+            let qty = parseInt(qtyElement.textContent);
+            if (qty < 99) {
+                qtyElement.textContent = qty + 1;
+            }
         }
         
-        async function addToCart(menuItemId, itemName) {
-            if (!token) {
+        function decrementQty(itemId) {
+            const qtyElement = document.getElementById('qty-' + itemId);
+            let qty = parseInt(qtyElement.textContent);
+            if (qty > 1) {
+                qtyElement.textContent = qty - 1;
+            }
+        }
+        
+        // Add to cart with animation
+        async function addToCart(event, menuItemId, itemName) {
+            if (!auth.isAuthenticated) {
                 window.location.href = '/login';
                 return;
             }
             
-            const quantityInput = document.getElementById('qty-' + menuItemId);
-            const quantity = parseInt(quantityInput.value) || 1;
+            const button = event.target;
+            const qtyElement = document.getElementById('qty-' + menuItemId);
+            const quantity = parseInt(qtyElement.textContent) || 1;
+            
+            // Add ripple effect
+            createRipple(event);
+            
+            // Disable button
+            const originalText = button.textContent;
+            button.disabled = true;
+            button.innerHTML = '<span class="spinner spinner-sm"></span>';
             
             try {
                 const response = await fetch('/api/cart/add', {
                     method: 'POST',
                     headers: {
                         'Content-Type': 'application/json',
-                        'Authorization': 'Bearer ' + token
+                        'Authorization': 'Bearer ' + auth.token
                     },
                     body: JSON.stringify({ menuItemId: menuItemId, quantity: quantity })
                 });
                 
                 if (response.ok) {
-                    showToast('✓ ' + quantity + 'x ' + itemName + ' added to cart!', 'success');
-                    quantityInput.value = 1;
+                    // Show success toast
+                    toast.success(`✓ ${quantity}x ${itemName} added to cart!`);
+                    
+                    // Animate flying to cart
+                    animateFlyToCart(button, itemName);
+                    
+                    // Update cart badge
+                    refreshCartBadge();
+                    
+                    // Reset quantity
+                    qtyElement.textContent = '1';
+                    
                 } else {
                     const errorText = await response.text();
                     if (errorText.includes('different shop')) {
-                        showToast('⚠ Cannot add items from different shops! Please clear your cart first.', 'error');
+                        toast.error('⚠ Cannot add items from different shops! Please clear your cart first.');
                     } else {
-                        showToast('⚠ ' + (errorText || 'Failed to add item to cart'), 'error');
+                        toast.error(errorText || 'Failed to add item to cart');
                     }
                 }
             } catch (error) {
-                showToast('⚠ Error adding item to cart. Please try again.', 'error');
+                console.error('Error adding to cart:', error);
+                toast.error('Error adding item to cart. Please try again.');
+            } finally {
+                button.disabled = false;
+                button.textContent = originalText;
             }
         }
         
-        function closeModal() {
-            document.getElementById('menuModal').style.display = 'none';
+        // Close modal
+        function closeMenuModal() {
+            closeModal(document.getElementById('menuModal'));
         }
         
-        function logout() {
-            localStorage.clear();
-            window.location.href = '/';
-        }
+        // Close modal on backdrop click
+        document.querySelector('.modal-backdrop')?.addEventListener('click', closeMenuModal);
         
+        // Load shops on page load
         loadShops();
     </script>
 </body>

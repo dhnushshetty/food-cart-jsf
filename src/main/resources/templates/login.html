@@ -4,51 +4,186 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Login - Food Cart Platform</title>
+    <link rel="stylesheet" href="/css/main.css">
+    <link rel="stylesheet" href="/css/animations.css">
+    <link rel="stylesheet" href="/css/components.css">
     <style>
-        * { margin: 0; padding: 0; box-sizing: border-box; }
-        body { font-family: Arial, sans-serif; background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); min-height: 100vh; display: flex; align-items: center; justify-content: center; }
-        .container { background: white; padding: 2rem; border-radius: 8px; box-shadow: 0 4px 6px rgba(0,0,0,0.1); width: 100%; max-width: 400px; }
-        h2 { color: #2c3e50; margin-bottom: 1.5rem; text-align: center; }
-        .form-group { margin-bottom: 1rem; }
-        label { display: block; margin-bottom: 0.5rem; color: #2c3e50; font-weight: bold; }
-        input { width: 100%; padding: 0.8rem; border: 1px solid #ddd; border-radius: 4px; font-size: 1rem; }
-        input:focus { outline: none; border-color: #667eea; }
-        .btn { width: 100%; padding: 0.8rem; background: #667eea; color: white; border: none; border-radius: 4px; font-size: 1rem; font-weight: bold; cursor: pointer; margin-top: 1rem; }
-        .btn:hover { background: #5568d3; }
-        .error { color: #e74c3c; margin-top: 1rem; text-align: center; display: none; }
-        .success { color: #27ae60; margin-top: 1rem; text-align: center; display: none; }
-        .links { text-align: center; margin-top: 1rem; }
-        .links a { color: #667eea; text-decoration: none; }
-        .links a:hover { text-decoration: underline; }
+        body {
+            background: linear-gradient(135deg, var(--primary-600) 0%, var(--secondary-600) 100%);
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: var(--space-4);
+        }
+        .auth-container {
+            background: white;
+            padding: var(--space-8);
+            border-radius: var(--radius-xl);
+            box-shadow: var(--shadow-xl);
+            width: 100%;
+            max-width: 450px;
+            animation: scaleIn 0.3s ease-out;
+        }
+        .auth-header {
+            text-align: center;
+            margin-bottom: var(--space-8);
+        }
+        .auth-logo {
+            font-size: var(--text-5xl);
+            margin-bottom: var(--space-4);
+        }
+        .auth-title {
+            font-size: var(--text-3xl);
+            font-weight: var(--font-bold);
+            color: var(--gray-900);
+            margin-bottom: var(--space-2);
+        }
+        .auth-subtitle {
+            color: var(--gray-600);
+            font-size: var(--text-base);
+        }
+        .password-toggle {
+            position: absolute;
+            right: var(--space-4);
+            top: 50%;
+            transform: translateY(-50%);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            height: 40px;
+            background: none;
+            border: none;
+            color: var(--gray-500);
+            cursor: pointer;
+            font-size: var(--text-lg);
+            padding: var(--space-2);
+        }
+        .password-toggle:hover {
+            color: var(--gray-700);
+        }
+        .auth-links {
+            text-align: center;
+            margin-top: var(--space-6);
+            color: var(--gray-600);
+        }
+        .auth-links a {
+            color: var(--primary-600);
+            font-weight: var(--font-semibold);
+        }
+        .auth-links a:hover {
+            color: var(--primary-700);
+            text-decoration: underline;
+        }
+        .divider {
+            margin: var(--space-6) 0;
+        }
     </style>
 </head>
 <body>
-    <div class="container">
-        <h2>🍕 Login</h2>
+    <div class="auth-container">
+        <div class="auth-header">
+            <div class="auth-logo">🍕</div>
+            <h1 class="auth-title">Welcome Back</h1>
+            <p class="auth-subtitle">Login to your Food Cart Platform account</p>
+        </div>
+        
         <form id="loginForm">
             <div class="form-group">
-                <label for="username">Username</label>
-                <input type="text" id="username" name="username" required>
+                <label for="username" class="form-label">Username</label>
+                <input 
+                    type="text" 
+                    id="username" 
+                    name="username" 
+                    class="form-input" 
+                    placeholder="Enter your username"
+                    required
+                    autocomplete="username">
+                <span class="form-error"></span>
             </div>
-            <div class="form-group">
-                <label for="password">Password</label>
-                <input type="password" id="password" name="password" required>
+            
+            <div class="form-group" style="position: relative;">
+                <label for="password" class="form-label">Password</label>
+                <input 
+                    type="password" 
+                    id="password" 
+                    name="password" 
+                    class="form-input" 
+                    placeholder="Enter your password"
+                    required
+                    autocomplete="current-password"
+                    style="padding-right: 3rem;">
+                <button type="button" class="password-toggle" onclick="togglePassword()">
+                    <span id="toggleIcon">👁️</span>
+                </button>
+                <span class="form-error"></span>
             </div>
-            <button type="submit" class="btn">Login</button>
+            
+            <button type="submit" class="btn btn-primary" style="width: 100%; margin-top: var(--space-6);">
+                Login
+            </button>
         </form>
-        <div class="error" id="error"></div>
-        <div class="success" id="success"></div>
-        <div class="links">
+        
+        <div class="divider"></div>
+        
+        <div class="auth-links">
             <p>Don't have an account? <a href="/register">Register here</a></p>
-            <p><a href="/">Back to Home</a></p>
+            <p style="margin-top: var(--space-2);"><a href="/">← Back to Home</a></p>
         </div>
     </div>
     
+    <!-- Scripts -->
+    <script src="/js/utils.js"></script>
+    <script src="/js/animations.js"></script>
+    <script src="/js/toast.js"></script>
     <script>
+        // Toggle password visibility
+        function togglePassword() {
+            const passwordInput = document.getElementById('password');
+            const toggleIcon = document.getElementById('toggleIcon');
+            
+            if (passwordInput.type === 'password') {
+                passwordInput.type = 'text';
+                toggleIcon.textContent = '🙈';
+            } else {
+                passwordInput.type = 'password';
+                toggleIcon.textContent = '👁️';
+            }
+        }
+        
+        // Form validation
+        const usernameInput = document.getElementById('username');
+        const passwordInput = document.getElementById('password');
+        
+        usernameInput.addEventListener('blur', () => {
+            validateField(usernameInput, validateUsername);
+        });
+        
+        passwordInput.addEventListener('blur', () => {
+            validateField(passwordInput, validatePassword);
+        });
+        
+        // Form submission
         document.getElementById('loginForm').addEventListener('submit', async (e) => {
             e.preventDefault();
-            const username = document.getElementById('username').value;
-            const password = document.getElementById('password').value;
+            
+            const username = usernameInput.value.trim();
+            const password = passwordInput.value;
+            
+            // Validate fields
+            const isUsernameValid = validateField(usernameInput, validateUsername);
+            const isPasswordValid = validateField(passwordInput, validatePassword);
+            
+            if (!isUsernameValid || !isPasswordValid) {
+                shake(document.querySelector('.auth-container'));
+                return;
+            }
+            
+            // Disable submit button
+            const submitBtn = e.target.querySelector('button[type="submit"]');
+            const originalText = submitBtn.textContent;
+            submitBtn.disabled = true;
+            submitBtn.innerHTML = '<span class="spinner spinner-sm"></span> Logging in...';
             
             try {
                 const response = await fetch('/api/auth/login', {
@@ -57,17 +192,13 @@
                     body: JSON.stringify({ username, password })
                 });
                 
-                document.getElementById('error').style.display = 'none';
-                document.getElementById('success').style.display = 'none';
-                
                 if (response.ok) {
                     const data = await response.json();
                     localStorage.setItem('token', data.token);
                     localStorage.setItem('username', data.username);
                     localStorage.setItem('role', data.role);
                     
-                    document.getElementById('success').textContent = 'Login successful! Redirecting...';
-                    document.getElementById('success').style.display = 'block';
+                    toast.success('Login successful! Redirecting...');
                     
                     setTimeout(() => {
                         if (data.role === 'ROLE_OWNER') {
@@ -77,13 +208,29 @@
                         }
                     }, 1000);
                 } else {
-                    document.getElementById('error').textContent = 'Invalid username or password. Please try again.';
-                    document.getElementById('error').style.display = 'block';
+                    // Show user-friendly error message
+                    toast.error('Invalid username or password. Please try again.');
+                    shake(document.querySelector('.auth-container'));
+                    submitBtn.disabled = false;
+                    submitBtn.textContent = originalText;
                 }
             } catch (error) {
-                document.getElementById('error').textContent = 'Login failed. Please check your connection and try again.';
-                document.getElementById('error').style.display = 'block';
+                console.error('Login error:', error);
+                toast.error('Login failed. Please check your connection and try again.');
+                shake(document.querySelector('.auth-container'));
+                submitBtn.disabled = false;
+                submitBtn.textContent = originalText;
             }
+        });
+        
+        // Add input animations
+        document.querySelectorAll('.form-input').forEach(input => {
+            input.addEventListener('focus', () => {
+                input.parentElement.classList.add('animate-pulse');
+                setTimeout(() => {
+                    input.parentElement.classList.remove('animate-pulse');
+                }, 300);
+            });
         });
     </script>
 </body>

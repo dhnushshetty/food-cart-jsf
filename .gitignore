@@ -2,3 +2,7 @@
 .kiro/specs/food-cart-platform/requirements.md
 .kiro/specs/food-cart-platform/tasks.md
 .kiro/specs/multi-vendor-food-cart/requirements.md
+.kiro/specs/thymeleaf-visual-refactor/design.md
+.kiro/specs/thymeleaf-visual-refactor/requirements.md
+.kiro/specs/thymeleaf-visual-refactor/tasks.md
+DATABASE_MIGRATION_GUIDE.md

@@ -1,247 +1,493 @@
 <!DOCTYPE html>
-<html>
+<html xmlns:th="http://www.thymeleaf.org">
 <head>
-    <title>Owner Dashboard</title>
-    <style>
-        * { margin: 0; padding: 0; box-sizing: border-box; }
-        body { font-family: Arial, sans-serif; background: #f5f5f5; }
-        .navbar { background: #2c3e50; color: white; padding: 1rem 2rem; display: flex; justify-content: space-between; align-items: center; }
-        .container { max-width: 1200px; margin: 2rem auto; padding: 0 2rem; }
-        .stats { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 1rem; margin-bottom: 2rem; }
-        .stat-card { background: white; padding: 1.5rem; border-radius: 4px; text-align: center; }
-        .stat-card h3 { font-size: 2rem; color: #667eea; }
-        .section { background: white; padding: 1.5rem; border-radius: 4px; margin-bottom: 2rem; }
-        .section h2 { margin-bottom: 1rem; color: #2c3e50; }
-        .form-group { margin-bottom: 1rem; }
-        .form-group label { display: block; margin-bottom: 0.5rem; font-weight: bold; }
-        .form-group input, .form-group textarea { width: 100%; padding: 0.5rem; border: 1px solid #ddd; border-radius: 4px; }
-        .menu-item { padding: 1rem; border-bottom: 1px solid #eee; display: flex; gap: 1rem; align-items: center; }
-        .menu-item-image { width: 60px; height: 60px; object-fit: cover; border-radius: 8px; flex-shrink: 0; }
-        .menu-item-image-placeholder { width: 60px; height: 60px; background: #e0e0e0; border-radius: 8px; display: flex; align-items: center; justify-content: center; font-size: 1.5rem; flex-shrink: 0; }
-        .menu-item-info { flex: 1; }
-        .menu-item-actions { display: flex; gap: 0.5rem; }
-        .order { padding: 1rem; border-bottom: 1px solid #eee; margin-bottom: 1rem; background: #f8f9fa; border-radius: 4px; }
-        .order.delivered { background: #d4edda; }
-        .btn { padding: 0.5rem 1rem; background: #667eea; color: white; border: none; border-radius: 4px; cursor: pointer; margin: 0.2rem; }
-        .btn-danger { background: #e74c3c; }
-        .btn-success { background: #27ae60; }
-        .btn-disabled { background: #95a5a6; cursor: not-allowed; }
-        .tabs { display: flex; gap: 1rem; margin-bottom: 1rem; border-bottom: 2px solid #eee; }
-        .tab { padding: 1rem; cursor: pointer; border-bottom: 3px solid transparent; }
-        .tab.active { border-bottom-color: #667eea; color: #667eea; font-weight: bold; }
-        .tab-content { display: none; }
-        .tab-content.active { display: block; }
-        .modal { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.5); z-index: 1000; }
-        .modal-content { background: white; margin: 2rem auto; padding: 2rem; border-radius: 8px; max-width: 600px; }
-        .modal-header { display: flex; justify-content: space-between; margin-bottom: 1rem; }
-        .close { font-size: 2rem; cursor: pointer; }
-    </style>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Owner Dashboard - Food Cart Platform</title>
+    <link rel="stylesheet" href="/css/main.css">
+    <link rel="stylesheet" href="/css/animations.css">
+    <link rel="stylesheet" href="/css/components.css">
 </head>
 <body>
+    <!-- Navigation Bar -->
     <nav class="navbar">
-        <h1>📊 Owner Dashboard</h1>
-        <a href="#" onclick="logout()" style="color: white; text-decoration: none;">Logout</a>
+        <div class="navbar-container">
+            <a href="/" class="navbar-brand">🍕 Food Cart Platform</a>
+            <div class="navbar-links">
+                <a href="/owner/dashboard" class="navbar-link active">📊 Dashboard</a>
+                <a href="#" class="navbar-link" onclick="logout()">Logout</a>
+            </div>
+        </div>
     </nav>
-    <div class="container">
-        <div class="stats" id="stats"></div>
+    
+    <!-- Main Content -->
+    <div class="container py-8">
+        <h1 class="text-4xl font-bold mb-8">Owner Dashboard</h1>
         
-        <div class="tabs">
-            <div class="tab active" onclick="showTab('shop')">🏪 Shop Details</div>
-            <div class="tab" onclick="showTab('menu')">🍕 Menu Items</div>
-            <div class="tab" onclick="showTab('orders')">📦 Orders</div>
+        <!-- Statistics Cards -->
+        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8" id="statsCards">
+            <!-- Stats will be loaded here -->
         </div>
         
-        <div id="shop-tab" class="tab-content active">
-            <div class="section">
-                <h2>Update Shop Details</h2>
-                <form onsubmit="updateShop(event)">
-                    <div class="form-group">
-                        <label>Shop Name</label>
-                        <input type="text" id="shopName" required>
-                    </div>
-                    <div class="form-group">
-                        <label>Description</label>
-                        <textarea id="shopDescription" rows="3" required></textarea>
-                    </div>
-                    <div class="form-group">
-                        <label>Address</label>
-                        <input type="text" id="shopAddress" required>
-                    </div>
-                    <button type="submit" class="btn btn-success">Update Shop</button>
-                </form>
+        <!-- Tab Navigation -->
+        <div class="tabs mb-6">
+            <ul class="tabs-list">
+                <li><button class="tab-button active" data-tab="shop">🏪 Shop Details</button></li>
+                <li><button class="tab-button" data-tab="menu">🍕 Menu Items</button></li>
+                <li><button class="tab-button" data-tab="orders">📦 Orders</button></li>
+            </ul>
+        </div>
+        
+        <!-- Shop Details Tab -->
+        <div id="shopTab" class="tab-content active">
+            <div class="card">
+                <div class="card-content">
+                    <h2 class="text-2xl font-bold mb-6">Update Shop Details</h2>
+                    <form id="shopForm" onsubmit="updateShop(event)">
+                        <div class="form-group">
+                            <label for="shopName" class="form-label">Shop Name</label>
+                            <input type="text" id="shopName" class="form-input" required>
+                        </div>
+                        
+                        <div class="form-group">
+                            <label for="shopDescription" class="form-label">Description</label>
+                            <textarea id="shopDescription" class="form-textarea" rows="3" required></textarea>
+                        </div>
+                        
+                        <div class="form-group">
+                            <label for="shopAddress" class="form-label">Address</label>
+                            <input type="text" id="shopAddress" class="form-input" required>
+                        </div>
+                        
+                        <div class="form-group">
+                            <label for="shopImageFile" class="form-label">Shop Image (optional)</label>
+                            <input type="file" id="shopImageFile" class="form-input" accept="image/*">
+                            <small class="text-gray-600">Max size: 500KB. This image will be displayed on the shop card.</small>
+                            <div id="shopImagePreview" class="mt-3" style="display: none;">
+                                <p class="text-sm text-gray-600 mb-2">Current shop image:</p>
+                                <img id="shopPreviewImg" style="max-width: 300px; border-radius: var(--radius-lg);">
+                            </div>
+                        </div>
+                        
+                        <button type="submit" class="btn btn-primary">
+                            Update Shop Details
+                        </button>
+                    </form>
+                </div>
             </div>
         </div>
         
-        <div id="menu-tab" class="tab-content">
-            <div class="section">
-                <h2>Add Menu Item</h2>
-                <form onsubmit="addMenuItem(event)">
-                    <div class="form-group">
-                        <label>Item Name</label>
-                        <input type="text" id="itemName" required>
-                    </div>
-                    <div class="form-group">
-                        <label>Description</label>
-                        <textarea id="itemDescription" rows="2" required></textarea>
-                    </div>
-                    <div class="form-group">
-                        <label>Price (₹)</label>
-                        <input type="number" step="0.01" id="itemPrice" required>
-                    </div>
-                    <div class="form-group">
-                        <label>Image (optional)</label>
-                        <input type="file" id="itemImageFile" accept="image/*">
-                        <small>Select an image from your device</small>
-                    </div>
-                    <button type="submit" class="btn btn-success">Add Menu Item</button>
-                </form>
+        <!-- Menu Items Tab -->
+        <div id="menuTab" class="tab-content">
+            <!-- Add Menu Item Form -->
+            <div class="card mb-6">
+                <div class="card-content">
+                    <h2 class="text-2xl font-bold mb-6">Add Menu Item</h2>
+                    <form id="addMenuForm" onsubmit="addMenuItem(event)">
+                        <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                            <div class="form-group">
+                                <label for="itemName" class="form-label">Item Name</label>
+                                <input type="text" id="itemName" class="form-input" placeholder="e.g., Margherita Pizza" required>
+                            </div>
+                            
+                            <div class="form-group">
+                                <label for="itemPrice" class="form-label">Price (₹)</label>
+                                <input type="number" step="0.01" id="itemPrice" class="form-input" placeholder="0.00" required>
+                            </div>
+                        </div>
+                        
+                        <div class="form-group">
+                            <label for="itemDescription" class="form-label">Description</label>
+                            <textarea id="itemDescription" class="form-textarea" rows="2" placeholder="Describe your delicious item..." required></textarea>
+                        </div>
+                        
+                        <div class="form-group">
+                            <label for="itemImageFile" class="form-label">Image (optional)</label>
+                            <input type="file" id="itemImageFile" class="form-input" accept="image/*">
+                            <small class="text-gray-600">Max size: 500KB. Supported formats: JPG, PNG, GIF</small>
+                            <div id="imagePreview" class="mt-3" style="display: none;">
+                                <img id="previewImg" style="max-width: 200px; border-radius: var(--radius-lg);">
+                            </div>
+                        </div>
+                        
+                        <button type="submit" class="btn btn-primary">
+                            Add Menu Item
+                        </button>
+                    </form>
+                </div>
             </div>
             
-            <div class="section">
-                <h2>Your Menu Items</h2>
-                <div id="menuItems"></div>
+            <!-- Menu Items List -->
+            <div class="card">
+                <div class="card-content">
+                    <h2 class="text-2xl font-bold mb-6">Your Menu Items</h2>
+                    <div id="menuItems">
+                        <!-- Menu items will be loaded here -->
+                    </div>
+                </div>
             </div>
         </div>
         
-        <div id="orders-tab" class="tab-content">
-            <div class="section">
-                <h2>Recent Orders</h2>
-                <div id="orders"></div>
+        <!-- Orders Tab -->
+        <div id="ordersTab" class="tab-content">
+            <div class="card">
+                <div class="card-content">
+                    <h2 class="text-2xl font-bold mb-6">Recent Orders</h2>
+                    <div id="ordersContainer">
+                        <!-- Orders will be loaded here -->
+                    </div>
+                </div>
             </div>
         </div>
     </div>
     
+    <!-- Edit Menu Item Modal -->
     <div id="editModal" class="modal">
+        <div class="modal-backdrop"></div>
         <div class="modal-content">
             <div class="modal-header">
-                <h2>Edit Menu Item</h2>
-                <span class="close" onclick="closeEditModal()">&times;</span>
+                <h2 class="modal-title">Edit Menu Item</h2>
+                <button class="modal-close" onclick="closeEditModal()">&times;</button>
             </div>
-            <form onsubmit="saveEdit(event)">
-                <input type="hidden" id="editItemId">
-                <div class="form-group">
-                    <label>Item Name</label>
-                    <input type="text" id="editItemName" required>
-                </div>
-                <div class="form-group">
-                    <label>Description</label>
-                    <textarea id="editItemDescription" rows="2" required></textarea>
-                </div>
-                <div class="form-group">
-                    <label>Price (₹)</label>
-                    <input type="number" step="0.01" id="editItemPrice" required>
-                </div>
-                <div class="form-group">
-                    <label>Image (optional)</label>
-                    <input type="file" id="editItemImageFile" accept="image/*">
-                    <small>Select an image from your device</small>
-                    <div id="currentImage" style="margin-top: 0.5rem;"></div>
-                </div>
-                <button type="submit" class="btn btn-success">Save Changes</button>
-                <button type="button" class="btn" onclick="closeEditModal()">Cancel</button>
-            </form>
+            <div class="modal-body">
+                <form id="editMenuForm" onsubmit="saveEdit(event)">
+                    <input type="hidden" id="editItemId">
+                    
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                        <div class="form-group">
+                            <label for="editItemName" class="form-label">Item Name</label>
+                            <input type="text" id="editItemName" class="form-input" required>
+                        </div>
+                        
+                        <div class="form-group">
+                            <label for="editItemPrice" class="form-label">Price (₹)</label>
+                            <input type="number" step="0.01" id="editItemPrice" class="form-input" required>
+                        </div>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="editItemDescription" class="form-label">Description</label>
+                        <textarea id="editItemDescription" class="form-textarea" rows="2" required></textarea>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="editItemImageFile" class="form-label">Image (optional)</label>
+                        <input type="file" id="editItemImageFile" class="form-input" accept="image/*">
+                        <div id="currentImage" class="mt-3"></div>
+                    </div>
+                    
+                    <div class="flex gap-3 mt-6">
+                        <button type="submit" class="btn btn-primary">Save Changes</button>
+                        <button type="button" class="btn btn-secondary" onclick="closeEditModal()">Cancel</button>
+                    </div>
+                </form>
+            </div>
         </div>
     </div>
     
+    <!-- Delete Confirmation Modal -->
+    <div id="deleteModal" class="modal">
+        <div class="modal-backdrop"></div>
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2 class="modal-title">Confirm Delete</h2>
+                <button class="modal-close" onclick="closeDeleteModal()">&times;</button>
+            </div>
+            <div class="modal-body">
+                <p class="mb-6">Are you sure you want to delete this menu item? This action cannot be undone.</p>
+                <div class="flex gap-3">
+                    <button class="btn btn-danger" onclick="confirmDelete()">Delete</button>
+                    <button class="btn btn-secondary" onclick="closeDeleteModal()">Cancel</button>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Scripts -->
+    <script src="/js/utils.js"></script>
+    <script src="/js/animations.js"></script>
+    <script src="/js/toast.js"></script>
     <script>
-        const token = localStorage.getItem('token');
-        if (!token) window.location.href = '/login';
+        // Require authentication
+        requireAuth();
+        requireRole('ROLE_OWNER');
         
+        const auth = getAuthState();
         let shopId = null;
+        let deleteItemId = null;
         
-        function showTab(tab) {
-            document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
-            document.querySelectorAll('.tab-content').forEach(c => c.classList.remove('active'));
-            event.target.classList.add('active');
-            document.getElementById(tab + '-tab').classList.add('active');
-        }
+        // Tab switching
+        const tabButtons = document.querySelectorAll('.tab-button');
+        const tabContents = document.querySelectorAll('.tab-content');
         
+        tabButtons.forEach(button => {
+            button.addEventListener('click', () => {
+                const tabName = button.dataset.tab;
+                
+                // Update active states
+                tabButtons.forEach(btn => btn.classList.remove('active'));
+                button.classList.add('active');
+                
+                // Show/hide content with animation
+                tabContents.forEach(content => {
+                    if (content.id === tabName + 'Tab') {
+                        content.classList.add('active');
+                    } else {
+                        content.classList.remove('active');
+                    }
+                });
+            });
+        });
+        
+        // Load dashboard data
         async function loadDashboard() {
-            await loadStats();
             await loadShop();
+            await loadStats();
             await loadMenuItems();
             await loadOrders();
         }
         
+        // Load statistics
         async function loadStats() {
-            const statsRes = await fetch('/api/owner/statistics', {
-                headers: { 'Authorization': 'Bearer ' + token }
-            });
-            const stats = await statsRes.json();
+            const container = document.getElementById('statsCards');
             
-            document.getElementById('stats').innerHTML = 
-                '<div class="stat-card"><h3>₹' + (stats.totalRevenue || 0) + '</h3><p>Total Revenue</p></div>' +
-                '<div class="stat-card"><h3>' + (stats.pendingOrdersCount || 0) + '</h3><p>Pending Orders</p></div>';
-        }
-        
-        async function loadShop() {
-            const res = await fetch('/api/owner/my-shop', {
-                headers: { 'Authorization': 'Bearer ' + token }
-            });
-            const shop = await res.json();
-            shopId = shop.id;
-            
-            document.getElementById('shopName').value = shop.shopName;
-            document.getElementById('shopDescription').value = shop.description;
-            document.getElementById('shopAddress').value = shop.address;
-        }
-        
-        async function updateShop(e) {
-            e.preventDefault();
-            const data = {
-                shopName: document.getElementById('shopName').value,
-                description: document.getElementById('shopDescription').value,
-                address: document.getElementById('shopAddress').value
-            };
-            
-            const res = await fetch('/api/owner/my-shop', {
-                method: 'PUT',
-                headers: {
-                    'Content-Type': 'application/json',
-                    'Authorization': 'Bearer ' + token
-                },
-                body: JSON.stringify(data)
-            });
-            
-            if (res.ok) alert('Shop updated successfully!');
-        }
-        
-        async function loadMenuItems() {
-            if (!shopId) await loadShop();
-            
-            const res = await fetch('/api/shops/' + shopId + '/menu');
-            const items = await res.json();
-            
-            if (items.length === 0) {
-                document.getElementById('menuItems').innerHTML = '<p>No menu items yet. Add your first item above!</p>';
-            } else {
-                document.getElementById('menuItems').innerHTML = items.map(function(item) {
-                    const imageHtml = item.imageUrl ? 
-                        '<img src="' + item.imageUrl + '" alt="' + item.name + '" class="menu-item-image" onerror="this.style.display=\'none\'; this.nextElementSibling.style.display=\'flex\';">' +
-                        '<div class="menu-item-image-placeholder" style="display:none;">🍽️</div>' :
-                        '<div class="menu-item-image-placeholder">🍽️</div>';
-                    
-                    return '<div class="menu-item">' +
-                        imageHtml +
-                        '<div class="menu-item-info">' +
-                        '<h3>' + item.name + '</h3>' +
-                        '<p>' + item.description + '</p>' +
-                        '<p><strong>₹' + item.price + '</strong></p>' +
-                        '</div>' +
-                        '<div class="menu-item-actions">' +
-                        '<button class="btn" onclick="openEditModal(' + item.id + ', \'' + escapeHtml(item.name) + '\', \'' + escapeHtml(item.description) + '\', ' + item.price + ', \'' + (item.imageUrl || '') + '\')">Edit</button>' +
-                        '<button class="btn btn-danger" onclick="deleteMenuItem(' + item.id + ')">Delete</button>' +
-                        '</div></div>';
-                }).join('');
+            try {
+                const response = await fetch('/api/owner/statistics', {
+                    headers: { 'Authorization': 'Bearer ' + auth.token }
+                });
+                
+                const stats = await response.json();
+                
+                // Get menu items count
+                let menuCount = 0;
+                if (shopId) {
+                    try {
+                        const menuResponse = await fetch('/api/shops/' + shopId + '/menu');
+                        const menuItems = await menuResponse.json();
+                        menuCount = menuItems.length;
+                    } catch (e) {
+                        console.error('Error counting menu items:', e);
+                    }
+                }
+                
+                // Get total orders count
+                let totalOrdersCount = 0;
+                try {
+                    const ordersResponse = await fetch('/api/owner/orders', {
+                        headers: { 'Authorization': 'Bearer ' + auth.token }
+                    });
+                    const orders = await ordersResponse.json();
+                    totalOrdersCount = orders.length;
+                } catch (e) {
+                    console.error('Error counting orders:', e);
+                }
+                
+                container.innerHTML = `
+                    <div class="card animate-scale-in">
+                        <div class="card-content text-center">
+                            <div class="text-4xl font-bold mb-2" style="color: var(--success);">₹${stats.totalRevenue || 0}</div>
+                            <p class="text-gray-600">Total Revenue</p>
+                        </div>
+                    </div>
+                    <div class="card animate-scale-in delay-100">
+                        <div class="card-content text-center">
+                            <div class="text-4xl font-bold mb-2" style="color: var(--warning);">${stats.pendingOrdersCount || 0}</div>
+                            <p class="text-gray-600">Pending Orders</p>
+                        </div>
+                    </div>
+                    <div class="card animate-scale-in delay-200">
+                        <div class="card-content text-center">
+                            <div class="text-4xl font-bold mb-2" style="color: var(--info);">${totalOrdersCount}</div>
+                            <p class="text-gray-600">Total Orders</p>
+                        </div>
+                    </div>
+                    <div class="card animate-scale-in delay-300">
+                        <div class="card-content text-center">
+                            <div class="text-4xl font-bold mb-2" style="color: var(--primary-600);">${menuCount}</div>
+                            <p class="text-gray-600">Menu Items</p>
+                        </div>
+                    </div>
+                `;
+            } catch (error) {
+                console.error('Error loading stats:', error);
+                toast.error('Failed to load statistics');
             }
         }
         
-        function escapeHtml(text) {
-            return text.replace(/'/g, "\\'").replace(/"/g, '&quot;');
+        // Shop image preview
+        document.getElementById('shopImageFile').addEventListener('change', function(e) {
+            const file = e.target.files[0];
+            if (file) {
+                const reader = new FileReader();
+                reader.onload = function(e) {
+                    document.getElementById('shopPreviewImg').src = e.target.result;
+                    document.getElementById('shopImagePreview').style.display = 'block';
+                };
+                reader.readAsDataURL(file);
+            }
+        });
+        
+        // Load shop details
+        async function loadShop() {
+            try {
+                const response = await fetch('/api/owner/my-shop', {
+                    headers: { 'Authorization': 'Bearer ' + auth.token }
+                });
+                
+                const shop = await response.json();
+                shopId = shop.id;
+                
+                document.getElementById('shopName').value = shop.shopName;
+                document.getElementById('shopDescription').value = shop.description;
+                document.getElementById('shopAddress').value = shop.address;
+                
+                // Display current shop image if exists
+                if (shop.imageUrl) {
+                    document.getElementById('shopPreviewImg').src = shop.imageUrl;
+                    document.getElementById('shopImagePreview').style.display = 'block';
+                }
+            } catch (error) {
+                console.error('Error loading shop:', error);
+                toast.error('Failed to load shop details');
+            }
         }
         
+        // Update shop details
+        async function updateShop(e) {
+            e.preventDefault();
+            
+            const button = e.target.querySelector('button[type="submit"]');
+            const originalText = button.textContent;
+            button.disabled = true;
+            button.innerHTML = '<span class="spinner spinner-sm"></span> Updating...';
+            
+            // Handle image upload
+            const imageFile = document.getElementById('shopImageFile').files[0];
+            let imageUrl = null;
+            
+            if (imageFile) {
+                try {
+                    imageUrl = await fileToDataURL(imageFile);
+                } catch (error) {
+                    toast.error(error.message);
+                    button.disabled = false;
+                    button.textContent = originalText;
+                    return;
+                }
+            }
+            
+            const data = {
+                shopName: document.getElementById('shopName').value.trim(),
+                description: document.getElementById('shopDescription').value.trim(),
+                address: document.getElementById('shopAddress').value.trim(),
+                imageUrl: imageUrl
+            };
+            
+            try {
+                const response = await fetch('/api/owner/my-shop', {
+                    method: 'PUT',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'Authorization': 'Bearer ' + auth.token
+                    },
+                    body: JSON.stringify(data)
+                });
+                
+                if (response.ok) {
+                    toast.success('Shop details updated successfully!');
+                    // Clear file input
+                    document.getElementById('shopImageFile').value = '';
+                } else {
+                    toast.error('Failed to update shop details');
+                }
+            } catch (error) {
+                console.error('Error updating shop:', error);
+                toast.error('Error updating shop details');
+            } finally {
+                button.disabled = false;
+                button.textContent = originalText;
+            }
+        }
+        
+        // Image preview for add form
+        document.getElementById('itemImageFile').addEventListener('change', function(e) {
+            const file = e.target.files[0];
+            if (file) {
+                const reader = new FileReader();
+                reader.onload = function(e) {
+                    document.getElementById('previewImg').src = e.target.result;
+                    document.getElementById('imagePreview').style.display = 'block';
+                };
+                reader.readAsDataURL(file);
+            }
+        });
+        
+        // Load menu items
+        async function loadMenuItems() {
+            if (!shopId) await loadShop();
+            
+            const container = document.getElementById('menuItems');
+            showSpinner(container);
+            
+            try {
+                const response = await fetch('/api/shops/' + shopId + '/menu');
+                const items = await response.json();
+                
+                if (items.length === 0) {
+                    container.innerHTML = `
+                        <div class="empty-state">
+                            <div class="empty-state-icon">🍽️</div>
+                            <h3 class="empty-state-title">No Menu Items</h3>
+                            <p class="empty-state-description">Add your first menu item above to get started</p>
+                        </div>
+                    `;
+                    return;
+                }
+                
+                container.innerHTML = items.map((item, index) => `
+                    <div class="card card-flat mb-4 animate-fade-in" style="animation-delay: ${index * 50}ms; display: flex; flex-direction: row; align-items: center; gap: 1.5rem; padding: 1.5rem; background: linear-gradient(135deg, #1e293b 0%, #2d3748 100%);">
+                        ${item.imageUrl ? 
+                            `<img src="${item.imageUrl}" alt="${escapeHtml(item.name)}" style="width: 90px; height: 90px; object-fit: cover; border-radius: var(--radius-lg); flex-shrink: 0; border: 2px solid rgba(79, 70, 229, 0.3);" onerror="this.style.display='none'; this.nextElementSibling.style.display='flex';">
+                            <div style="display:none; width: 90px; height: 90px; background: rgba(79, 70, 229, 0.2); border-radius: var(--radius-lg); align-items: center; justify-content: center; font-size: 2rem; flex-shrink: 0; border: 2px solid rgba(79, 70, 229, 0.3);">🍽️</div>` :
+                            `<div style="display: flex; width: 90px; height: 90px; background: rgba(79, 70, 229, 0.2); border-radius: var(--radius-lg); align-items: center; justify-content: center; font-size: 2rem; flex-shrink: 0; border: 2px solid rgba(79, 70, 229, 0.3);">🍽️</div>`
+                        }
+                        <div style="flex: 1;">
+                            <h3 class="text-xl font-bold mb-2" style="color: var(--gray-100);">${escapeHtml(item.name)}</h3>
+                            <p class="mb-2" style="color: var(--gray-400); line-height: 1.6;">${escapeHtml(item.description)}</p>
+                            <p class="text-xl font-bold" style="color: var(--success);">₹${item.price}</p>
+                        </div>
+                        <div style="display: flex; gap: 0.75rem; flex-direction: column;">
+                            <button class="btn btn-primary btn-sm" onclick="openEditModal(${item.id}, '${escapeHtml(item.name).replace(/'/g, "\\'")}', '${escapeHtml(item.description).replace(/'/g, "\\'")}', ${item.price}, '${item.imageUrl || ''}')">
+                                ✏️ Edit
+                            </button>
+                            <button class="btn btn-danger btn-sm" onclick="openDeleteModal(${item.id})">
+                                🗑️ Delete
+                            </button>
+                        </div>
+                    </div>
+                `).join('');
+                
+            } catch (error) {
+                console.error('Error loading menu items:', error);
+                container.innerHTML = `
+                    <div class="empty-state">
+                        <div class="empty-state-icon">⚠️</div>
+                        <h3 class="empty-state-title">Error Loading Menu</h3>
+                        <p class="empty-state-description">Please try again</p>
+                    </div>
+                `;
+                toast.error('Failed to load menu items');
+            }
+        }
+        
+        // Add menu item
         async function addMenuItem(e) {
             e.preventDefault();
+            
+            const button = e.target.querySelector('button[type="submit"]');
+            const originalText = button.textContent;
+            button.disabled = true;
+            button.innerHTML = '<span class="spinner spinner-sm"></span> Adding...';
             
             const imageFile = document.getElementById('itemImageFile').files[0];
             let imageUrl = null;
@@ -250,41 +496,49 @@
                 try {
                     imageUrl = await fileToDataURL(imageFile);
                 } catch (error) {
-                    alert('Error processing image. Please try a smaller image.');
+                    toast.error(error.message);
+                    button.disabled = false;
+                    button.textContent = originalText;
                     return;
                 }
             }
             
             const data = {
-                name: document.getElementById('itemName').value,
-                description: document.getElementById('itemDescription').value,
+                name: document.getElementById('itemName').value.trim(),
+                description: document.getElementById('itemDescription').value.trim(),
                 price: parseFloat(document.getElementById('itemPrice').value),
                 imageUrl: imageUrl
             };
             
             try {
-                const res = await fetch('/api/owner/menu', {
+                const response = await fetch('/api/owner/menu', {
                     method: 'POST',
                     headers: {
                         'Content-Type': 'application/json',
-                        'Authorization': 'Bearer ' + token
+                        'Authorization': 'Bearer ' + auth.token
                     },
                     body: JSON.stringify(data)
                 });
                 
-                if (res.ok) {
-                    alert('Menu item added successfully!');
+                if (response.ok) {
+                    toast.success('Menu item added successfully!');
                     e.target.reset();
+                    document.getElementById('imagePreview').style.display = 'none';
                     loadMenuItems();
+                    loadStats();
                 } else {
-                    alert('Failed to add menu item');
+                    toast.error('Failed to add menu item');
                 }
             } catch (error) {
                 console.error('Error adding menu item:', error);
-                alert('Error adding menu item');
+                toast.error('Error adding menu item');
+            } finally {
+                button.disabled = false;
+                button.textContent = originalText;
             }
         }
         
+        // Open edit modal
         function openEditModal(id, name, description, price, imageUrl) {
             document.getElementById('editItemId').value = id;
             document.getElementById('editItemName').value = name;
@@ -293,22 +547,34 @@
             
             const currentImageDiv = document.getElementById('currentImage');
             if (imageUrl) {
-                currentImageDiv.innerHTML = '<img src="' + imageUrl + '" style="max-width: 100px; border-radius: 4px;"><br><small>Current image (upload new to replace)</small>';
+                currentImageDiv.innerHTML = `
+                    <p class="text-sm text-gray-600 mb-2">Current image:</p>
+                    <img src="${imageUrl}" style="max-width: 200px; border-radius: var(--radius-lg);">
+                    <p class="text-sm text-gray-600 mt-2">Upload a new image to replace</p>
+                `;
             } else {
-                currentImageDiv.innerHTML = '<small>No image currently set</small>';
+                currentImageDiv.innerHTML = '<p class="text-sm text-gray-600">No image currently set</p>';
             }
             
-            document.getElementById('editModal').style.display = 'block';
+            openModal(document.getElementById('editModal'));
         }
         
+        // Close edit modal
         function closeEditModal() {
-            document.getElementById('editModal').style.display = 'none';
+            closeModal(document.getElementById('editModal'));
+            document.getElementById('editMenuForm').reset();
         }
         
+        // Save edit
         async function saveEdit(e) {
             e.preventDefault();
-            const id = document.getElementById('editItemId').value;
             
+            const button = e.target.querySelector('button[type="submit"]');
+            const originalText = button.textContent;
+            button.disabled = true;
+            button.innerHTML = '<span class="spinner spinner-sm"></span> Saving...';
+            
+            const id = document.getElementById('editItemId').value;
             const imageFile = document.getElementById('editItemImageFile').files[0];
             let imageUrl = null;
             
@@ -316,97 +582,198 @@
                 try {
                     imageUrl = await fileToDataURL(imageFile);
                 } catch (error) {
-                    alert('Error processing image. Please try a smaller image.');
+                    toast.error(error.message);
+                    button.disabled = false;
+                    button.textContent = originalText;
                     return;
                 }
             }
             
             const data = {
-                name: document.getElementById('editItemName').value,
-                description: document.getElementById('editItemDescription').value,
+                name: document.getElementById('editItemName').value.trim(),
+                description: document.getElementById('editItemDescription').value.trim(),
                 price: parseFloat(document.getElementById('editItemPrice').value),
                 imageUrl: imageUrl
             };
             
             try {
-                const res = await fetch('/api/owner/menu/' + id, {
+                const response = await fetch('/api/owner/menu/' + id, {
                     method: 'PUT',
                     headers: {
                         'Content-Type': 'application/json',
-                        'Authorization': 'Bearer ' + token
+                        'Authorization': 'Bearer ' + auth.token
                     },
                     body: JSON.stringify(data)
                 });
                 
-                if (res.ok) {
-                    alert('Menu item updated successfully!');
+                if (response.ok) {
+                    toast.success('Menu item updated successfully!');
                     closeEditModal();
                     loadMenuItems();
                 } else {
-                    alert('Failed to update menu item');
+                    toast.error('Failed to update menu item');
                 }
             } catch (error) {
                 console.error('Error updating menu item:', error);
-                alert('Error updating menu item');
+                toast.error('Error updating menu item');
+            } finally {
+                button.disabled = false;
+                button.textContent = originalText;
             }
         }
         
-        async function deleteMenuItem(id) {
-            if (!confirm('Are you sure you want to delete this menu item?')) return;
+        // Open delete modal
+        function openDeleteModal(id) {
+            deleteItemId = id;
+            openModal(document.getElementById('deleteModal'));
+        }
+        
+        // Close delete modal
+        function closeDeleteModal() {
+            closeModal(document.getElementById('deleteModal'));
+            deleteItemId = null;
+        }
+        
+        // Confirm delete
+        async function confirmDelete() {
+            if (!deleteItemId) return;
             
-            const res = await fetch('/api/owner/menu/' + id, {
-                method: 'DELETE',
-                headers: { 'Authorization': 'Bearer ' + token }
-            });
-            
-            if (res.ok) {
-                alert('Menu item deleted successfully!');
-                loadMenuItems();
-            } else {
-                alert('Failed to delete menu item');
+            try {
+                const response = await fetch('/api/owner/menu/' + deleteItemId, {
+                    method: 'DELETE',
+                    headers: { 'Authorization': 'Bearer ' + auth.token }
+                });
+                
+                if (response.ok) {
+                    toast.success('Menu item deleted successfully!');
+                    closeDeleteModal();
+                    loadMenuItems();
+                    loadStats();
+                } else {
+                    toast.error('Failed to delete menu item');
+                }
+            } catch (error) {
+                console.error('Error deleting menu item:', error);
+                toast.error('Error deleting menu item');
             }
         }
         
+        // Load orders
         async function loadOrders() {
-            const ordersRes = await fetch('/api/owner/orders', {
-                headers: { 'Authorization': 'Bearer ' + token }
-            });
-            const orders = await ordersRes.json();
+            const container = document.getElementById('ordersContainer');
+            showSpinner(container);
             
-            if (orders.length === 0) {
-                document.getElementById('orders').innerHTML = '<p>No orders yet.</p>';
-            } else {
-                document.getElementById('orders').innerHTML = orders.map(function(order) {
+            try {
+                const response = await fetch('/api/owner/orders', {
+                    headers: { 'Authorization': 'Bearer ' + auth.token }
+                });
+                
+                const orders = await response.json();
+                
+                if (orders.length === 0) {
+                    container.innerHTML = `
+                        <div class="empty-state">
+                            <div class="empty-state-icon">📦</div>
+                            <h3 class="empty-state-title">No Orders Yet</h3>
+                            <p class="empty-state-description">Orders will appear here when customers place them</p>
+                        </div>
+                    `;
+                    return;
+                }
+                
+                container.innerHTML = orders.map((order, index) => {
                     const isDelivered = order.status === 'DELIVERED';
                     const customerName = order.customerUsername || 'Guest';
-                    return '<div class="order ' + (isDelivered ? 'delivered' : '') + '">' +
-                        '<p><strong>Order #' + order.id + '</strong> - ₹' + order.totalAmount + ' - ' + order.status + '</p>' +
-                        '<p><strong>Customer:</strong> ' + customerName + '</p>' +
-                        '<p>Items: ' + order.items.map(function(i) { return i.menuItemName + ' (x' + i.quantity + ')'; }).join(', ') + '</p>' +
-                        (isDelivered ? 
-                            '<p style="color: #27ae60; font-weight: bold;">✓ Delivery Completed - Cannot be changed</p>' :
-                            '<button class="btn" onclick="updateStatus(' + order.id + ', \'PREPARING\')">Preparing</button>' +
-                            '<button class="btn" onclick="updateStatus(' + order.id + ', \'READY\')">Ready</button>' +
-                            '<button class="btn btn-success" onclick="updateStatus(' + order.id + ', \'DELIVERED\')">Mark Delivered</button>'
-                        ) +
-                        '</div>';
+                    
+                    return `
+                        <div class="card card-flat mb-4 animate-fade-in" style="animation-delay: ${index * 50}ms;">
+                            <div class="card-content">
+                                <div class="flex justify-between items-center mb-4">
+                                    <div>
+                                        <h3 class="text-xl font-bold mb-1">Order #${order.id}</h3>
+                                        <p class="text-gray-600">👤 ${escapeHtml(customerName)}</p>
+                                    </div>
+                                    <div class="text-right">
+                                        <span class="badge badge-${getStatusBadgeClass(order.status)}">${order.status}</span>
+                                        <p class="text-xl font-bold mt-2" style="color: var(--success);">₹${order.totalAmount}</p>
+                                    </div>
+                                </div>
+                                
+                                <div class="mb-4">
+                                    <p class="text-sm font-semibold mb-2">Items:</p>
+                                    <p class="text-gray-700">${order.items.map(i => `${escapeHtml(i.menuItemName)} (×${i.quantity})`).join(', ')}</p>
+                                </div>
+                                
+                                ${isDelivered ? 
+                                    '<p class="text-success font-semibold">✓ Delivery Completed</p>' :
+                                    `<div class="flex gap-2 flex-wrap">
+                                        <button class="btn btn-secondary btn-sm" onclick="updateStatus(${order.id}, 'PREPARING')">
+                                            👨‍🍳 Preparing
+                                        </button>
+                                        <button class="btn btn-secondary btn-sm" onclick="updateStatus(${order.id}, 'READY')">
+                                            ✅ Ready
+                                        </button>
+                                        <button class="btn btn-success btn-sm" onclick="updateStatus(${order.id}, 'DELIVERED')">
+                                            🚚 Mark Delivered
+                                        </button>
+                                    </div>`
+                                }
+                            </div>
+                        </div>
+                    `;
                 }).join('');
+                
+            } catch (error) {
+                console.error('Error loading orders:', error);
+                container.innerHTML = `
+                    <div class="empty-state">
+                        <div class="empty-state-icon">⚠️</div>
+                        <h3 class="empty-state-title">Error Loading Orders</h3>
+                        <p class="empty-state-description">Please try again</p>
+                    </div>
+                `;
+                toast.error('Failed to load orders');
             }
         }
         
-        async function updateStatus(orderId, status) {
-            await fetch('/api/owner/orders/' + orderId + '/status', {
-                method: 'PUT',
-                headers: {
-                    'Content-Type': 'application/json',
-                    'Authorization': 'Bearer ' + token
-                },
-                body: JSON.stringify({ status: status })
-            });
-            loadOrders();
-            loadStats();
+        // Get status badge class
+        function getStatusBadgeClass(status) {
+            const statusMap = {
+                'PENDING': 'pending',
+                'PREPARING': 'preparing',
+                'READY': 'ready',
+                'DELIVERED': 'delivered',
+                'CANCELLED': 'cancelled'
+            };
+            return statusMap[status] || 'gray';
         }
         
+        // Update order status
+        async function updateStatus(orderId, status) {
+            try {
+                const response = await fetch('/api/owner/orders/' + orderId + '/status', {
+                    method: 'PUT',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'Authorization': 'Bearer ' + auth.token
+                    },
+                    body: JSON.stringify({ status: status })
+                });
+                
+                if (response.ok) {
+                    toast.success(`Order status updated to ${status}`);
+                    loadOrders();
+                    loadStats();
+                } else {
+                    toast.error('Failed to update order status');
+                }
+            } catch (error) {
+                console.error('Error updating status:', error);
+                toast.error('Error updating order status');
+            }
+        }
+        
+        // File to data URL
         function fileToDataURL(file) {
             return new Promise((resolve, reject) => {
                 if (file.size > 500000) {
@@ -415,16 +782,12 @@
                 }
                 const reader = new FileReader();
                 reader.onload = (e) => resolve(e.target.result);
-                reader.onerror = (e) => reject(e);
+                reader.onerror = (e) => reject(new Error('Error reading file'));
                 reader.readAsDataURL(file);
             });
         }
         
-        function logout() {
-            localStorage.clear();
-            window.location.href = '/';
-        }
-        
+        // Load dashboard on page load
         loadDashboard();
     </script>
 </body>
